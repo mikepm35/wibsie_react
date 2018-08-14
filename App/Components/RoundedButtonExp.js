@@ -1,8 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { TouchableOpacity, Text } from 'react-native'
-import styles from './Styles/RoundedButtonStyles'
-import { DotIndicator } from 'react-native-indicators';
+import styles from './Styles/RoundedButtonExpStyle'
 import ExamplesRegistry from '../Services/ExamplesRegistry'
 
 // Note that this file (App/Components/RoundedButton) needs to be
@@ -18,32 +17,38 @@ ExamplesRegistry.addComponentExample('Rounded Button', () =>
   />
 )
 
-export default class RoundedButton extends Component {
+export default class RoundedButtonExp extends Component {
   static propTypes = {
     onPress: PropTypes.func,
+    styleType: PropTypes.string,
     disabled: PropTypes.bool,
     text: PropTypes.string,
     children: PropTypes.string,
-    showActivityIndicator: PropTypes.bool,
     navigator: PropTypes.object
   }
 
   getText () {
     const buttonText = this.props.text || this.props.children || ''
-    return buttonText.toUpperCase()
+    //return buttonText.toUpperCase()
+    return buttonText
   }
 
   render () {
+    var buttonStyle = null;
+    if (this.props.styleType == 'cold') {
+      buttonStyle = styles.buttonCold;
+    } else if (this.props.styleType == 'comfort') {
+      buttonStyle = styles.buttonComfort;
+    } else if (this.props.styleType == 'hot') {
+      buttonStyle = styles.buttonHot;
+    }
+
     return (
       <TouchableOpacity
-        style={this.props.disabled ? styles.buttonDisabled : styles.button}
+        style={this.props.disabled ? styles.buttonDisabled : buttonStyle}
         onPress={this.props.onPress}
         disabled={this.props.disabled}>
-        {this.props.showActivityIndicator ? (
-          <DotIndicator color='white' />
-        ) : (
-          <Text style={this.props.disabled ? styles.buttonTextDisabled : styles.buttonText}>{this.getText()}</Text>
-        )}
+        <Text style={this.props.disabled ? styles.buttonTextDisabled : styles.buttonText}>{this.getText()}</Text>
       </TouchableOpacity>
     )
   }

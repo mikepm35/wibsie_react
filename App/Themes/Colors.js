@@ -18,7 +18,9 @@ const colors = {
   ember: 'rgba(164, 0, 48, 0.5)',
   fire: '#e73536',
   drawer: 'rgba(30, 30, 29, 0.95)',
+  green: '#09B233',
   eggplant: '#251a34',
+  lightEggplant: '#71667F',
   border: '#483F53',
   banner: '#5F3E63',
   text: '#E0D7E5'

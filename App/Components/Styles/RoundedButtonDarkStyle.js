@@ -7,7 +7,7 @@ export default StyleSheet.create({
     borderRadius: 5,
     marginHorizontal: Metrics.section,
     marginVertical: Metrics.baseMargin,
-    backgroundColor: Colors.lightEggplant,
+    backgroundColor: Colors.eggplant,
     justifyContent: 'center'
   },
   buttonDisabled: {
