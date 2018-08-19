@@ -184,6 +184,14 @@ class WeatherScreen extends Component {
       })
       .catch(function (error) {
         console.log('Error: ', error, error.request);
+        Alert.alert(
+          'Error',
+          'Error retrieving weather.',
+          [
+            {text: 'OK', onPress: () => {}},
+          ],
+          { cancelable: false }
+        );
       });
   }
 
@@ -294,7 +302,7 @@ class WeatherScreen extends Component {
               'Error',
               'Server error making prediction',
               [
-                {text: 'OK', onPress: () => resetInputs()},
+                {text: 'OK', onPress: () => {}},
               ],
               { cancelable: false }
             )
@@ -344,7 +352,7 @@ class WeatherScreen extends Component {
     this._updateCurrentPosition();
   }
 
-  static navigationOptions = ({navigation}) => {
+  static navigationOptions = ({navigation, state}) => {
     return {
       gesturesEnabled: false,
       headerTitle: '',

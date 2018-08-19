@@ -54,7 +54,7 @@ class SignupScreen extends Component {
     let authToken = this.state.config.authToken;
 
     // Validate if email is an email
-    if (this.state.user.email.indexOf('@') < 0 || this.state.user.email.indexOf('.') < 0) {
+    if (this.state.user.email.indexOf('@') < 0 || this.state.user.email.indexOf('.') < 0 || this.state.user.email.length > 75) {
       Alert.alert(
         'Error',
         'E-mail address is not valid.',
@@ -67,7 +67,7 @@ class SignupScreen extends Component {
     }
 
     // Validate if password meets complexity requirements
-    if (this.state.user.password.length < 6) {
+    if (this.state.user.password.length < 6 || this.state.user.password.length > 75) {
       Alert.alert(
         'Error',
         'Password must be at least 6 characters.',

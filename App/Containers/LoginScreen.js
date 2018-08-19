@@ -48,6 +48,7 @@ class LoginScreen extends Component {
       storeUserLocal = async () => {
         try {
           await AsyncStorage.setItem('wibsie:userid', this.state.user.id);
+          await AsyncStorage.setItem('wibsie:useremail', this.state.user.email);
         } catch (error) {
           console.log('Error storing user from login: ', error);
         }
@@ -57,6 +58,32 @@ class LoginScreen extends Component {
 
   _checkCredentials(navigation) {
     let urlUserQuery = this.state.config.endpointAPI + '/users/query';
+
+    // Validate if email is an email
+    if (this.state.user.email.indexOf('@') < 0 || this.state.user.email.indexOf('.') < 0 || this.state.user.email.length > 75) {
+      Alert.alert(
+        'Error',
+        'E-mail address is not valid.',
+        [
+          {text: 'OK', onPress: () => {this.setState({validInput: false});}},
+        ],
+        { cancelable: false }
+      )
+      return;
+    }
+
+    // Validate if password meets complexity requirements
+    if (this.state.user.password.length < 6 || this.state.user.password.length > 75) {
+      Alert.alert(
+        'Error',
+        'Password must be at least 6 characters.',
+        [
+          {text: 'OK', onPress: () => {this.setState({validInput: false});}},
+        ],
+        { cancelable: false }
+      )
+      return;
+    }
 
     axios.post(urlUserQuery, {
         email: this.state.user.email,
