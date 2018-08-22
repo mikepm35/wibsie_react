@@ -17,8 +17,8 @@ class LoginScreen extends Component {
   constructor(props) {
       super(props);
       this.state = {
-        config: {endpointAPI: 'https://dev-api.wibsie.com/app',
-                  endpointML: 'https://dev-api.wibsie.com/ml',
+        config: {endpointAPI: 'https://api.wibsie.com/app',
+                  endpointML: 'https://api.wibsie.com/ml',
                   authToken: '6d2a3a86ae6b4fffa5448c6bcb5c6c34'},
         user: {email: '',
                 password: ''}
