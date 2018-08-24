@@ -4,7 +4,7 @@ import { ApplicationStyles, Metrics, Colors, Fonts } from '../../Themes/'
 export default StyleSheet.create({
   ...ApplicationStyles.screen,
   textInput: {
-    height: 40,
+    height: (Metrics.aspectRatio > 1.6) ? 40 : 30,
     borderRadius: 5,
     paddingHorizontal: Metrics.smallMargin,
     marginHorizontal: Metrics.section,
@@ -45,6 +45,6 @@ export default StyleSheet.create({
   pickerText: {
     ...Fonts.style.description,
     color: Colors.snow,
-    height: 100
+    height: (Metrics.aspectRatio > 1.6 & Metrics.height > 650) ? 100 : 75
   },
 })

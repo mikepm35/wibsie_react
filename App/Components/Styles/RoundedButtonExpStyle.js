@@ -3,7 +3,7 @@ import { Fonts, Colors, Metrics } from '../../Themes/'
 
 export default StyleSheet.create({
   buttonCold: {
-    height: 45,
+    height: (Metrics.aspectRatio > 1.6) ? 45 : 35,
     borderRadius: 5,
     marginHorizontal: Metrics.smallMargin,
     marginVertical: Metrics.baseMargin,
@@ -12,7 +12,7 @@ export default StyleSheet.create({
     justifyContent: 'center'
   },
   buttonComfort: {
-    height: 45,
+    height: (Metrics.aspectRatio > 1.6) ? 45 : 35,
     borderRadius: 5,
     marginHorizontal: Metrics.smallMargin,
     marginVertical: Metrics.baseMargin,
@@ -21,7 +21,7 @@ export default StyleSheet.create({
     justifyContent: 'center'
   },
   buttonHot: {
-    height: 45,
+    height: (Metrics.aspectRatio > 1.6) ? 45 : 35,
     borderRadius: 5,
     marginHorizontal: Metrics.smallMargin,
     marginVertical: Metrics.baseMargin,
@@ -30,7 +30,7 @@ export default StyleSheet.create({
     justifyContent: 'center'
   },
   buttonDisabled: {
-    height: 45,
+    height: (Metrics.aspectRatio > 1.6) ? 45 : 35,
     borderRadius: 5,
     marginHorizontal: Metrics.smallMargin,
     marginVertical: Metrics.baseMargin,

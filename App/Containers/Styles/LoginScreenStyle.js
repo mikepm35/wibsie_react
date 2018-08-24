@@ -30,7 +30,7 @@ export default StyleSheet.create({
     paddingBottom: Metrics.section
   },
   textInput: {
-    height: 40,
+    height: (Metrics.aspectRatio > 1.6) ? 40 : 30,
     borderRadius: 5,
     paddingHorizontal: Metrics.smallMargin,
     marginHorizontal: Metrics.section,

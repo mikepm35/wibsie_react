@@ -69,7 +69,7 @@ class WeatherScreen extends Component {
         var date, month, day, ampm, hour, minutes, fullTime;
         date = new Date();
 
-        month = date.getMonth();
+        month = date.getMonth()+1; // 0 is first month
         day = date.getDate();
 
         hour = date.getHours();

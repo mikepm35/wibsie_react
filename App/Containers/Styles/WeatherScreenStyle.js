@@ -61,7 +61,7 @@ export default StyleSheet.create({
   pickerText: {
     ...Fonts.style.description,
     color: Colors.snow,
-    height: 100
+    height: (Metrics.aspectRatio > 1.6 & Metrics.height > 650) ? 100 : 75
   },
   predictionRow: {
     paddingVertical: Metrics.section,

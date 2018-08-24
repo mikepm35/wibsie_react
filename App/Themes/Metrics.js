@@ -1,15 +1,21 @@
 import {Dimensions, Platform} from 'react-native'
 
 const { width, height } = Dimensions.get('window')
+const aspectRatio = height/width;
+
+console.log('dimensions: ', height, width, aspectRatio);
 
 // Used via Metrics.baseMargin
 const metrics = {
-  marginHorizontal: 10,
-  marginVertical: 10,
-  section: 25,
-  baseMargin: 10,
-  doubleBaseMargin: 20,
-  smallMargin: 5,
+  aspectRatio: aspectRatio,
+  height: height,
+  width: width,
+  marginHorizontal: (aspectRatio > 1.6) ? 10 : 2,
+  marginVertical: (aspectRatio > 1.6) ? 10 : 2,
+  section: (aspectRatio > 1.6) ? 25 : 7,
+  baseMargin: (aspectRatio > 1.6) ? 10 : 4,
+  doubleBaseMargin: (aspectRatio > 1.6) ? 20 : 5,
+  smallMargin: (aspectRatio > 1.6) ? 5 : 2,
   doubleSection: 50,
   horizontalLineHeight: 1,
   screenWidth: width < height ? width : height,

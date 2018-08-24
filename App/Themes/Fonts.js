@@ -6,6 +6,7 @@ const type = {
 }
 
 const size = {
+  super: 54,
   h1: 38,
   h2: 34,
   h3: 30,
@@ -20,6 +21,10 @@ const size = {
 }
 
 const style = {
+  super: {
+    fontFamily: type.base,
+    fontSize: size.super
+  },
   h1: {
     fontFamily: type.base,
     fontSize: size.h1
