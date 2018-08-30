@@ -7,6 +7,7 @@ import RoundedButtonHollow from '../../App/Components/RoundedButtonHollow';
 import { Colors } from '../Themes/';
 import { connect } from 'react-redux';
 import axios from 'axios';
+import WibsieConfig from '../Config/WibsieConfig'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 
@@ -17,9 +18,7 @@ class LoginScreen extends Component {
   constructor(props) {
       super(props);
       this.state = {
-        config: {endpointAPI: 'https://api.wibsie.com/app',
-                  endpointML: 'https://api.wibsie.com/ml',
-                  authToken: '6d2a3a86ae6b4fffa5448c6bcb5c6c34'},
+        config: WibsieConfig,
         user: {email: '',
                 password: ''}
       }
@@ -57,7 +56,7 @@ class LoginScreen extends Component {
   }
 
   _checkCredentials(navigation) {
-    let urlUserQuery = this.state.config.endpointAPI + '/users/query';
+    let urlUserQuery = this.state.config.endpointAPI + '/users/query' + '?schema=' + this.state.config.schema;
 
     // Validate if email is an email
     if (this.state.user.email.indexOf('@') < 0 || this.state.user.email.indexOf('.') < 0 || this.state.user.email.length > 75) {

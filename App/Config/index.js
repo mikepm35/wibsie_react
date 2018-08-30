@@ -1,6 +1,7 @@
 import { Text } from 'react-native'
 import DebugConfig from './DebugConfig'
 import AppConfig from './AppConfig'
+import WibsieConfig from './WibsieConfig'
 
 // Allow/disallow font-scaling in app
 Text.defaultProps.allowFontScaling = AppConfig.allowTextFontScaling
@@ -10,3 +11,5 @@ if (__DEV__) {
   // it off, but the healthier approach is to fix the warnings.  =)
   console.disableYellowBox = !DebugConfig.yellowBox
 }
+
+console.log('WibsieConfig: ', WibsieConfig);

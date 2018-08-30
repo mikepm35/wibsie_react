@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import RoundedButton from '../../App/Components/RoundedButton'
 import RoundedButtonExp from '../../App/Components/RoundedButtonExp'
 import { DotIndicator } from 'react-native-indicators';
+import WibsieConfig from '../Config/WibsieConfig'
 
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
@@ -18,9 +19,7 @@ class WeatherScreen extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      config: {endpointAPI: 'https://api.wibsie.com/app',
-                endpointML: 'https://api.wibsie.com/ml',
-                authToken: '6d2a3a86ae6b4fffa5448c6bcb5c6c34'},
+      config: WibsieConfig,
       disabledControls: {experiencePicker: false,
                           predictionButton: true,
                           showReset: false,
@@ -173,7 +172,7 @@ class WeatherScreen extends Component {
       this._updateCurrentPosition();
     }
 
-    let url = endpointAPI + '/weatherreports?epoch=now&location=' + zip;
+    let url = endpointAPI + '/weatherreports?epoch=now&location=' + zip + '&schema=' + this.state.config.schema;
 
     console.log('Weather url', url, authToken);
 
@@ -209,8 +208,8 @@ class WeatherScreen extends Component {
     });
 
     // Start update experience with prediction result
-    let urlExperiences = endpointAPI + '/users/' + userId + '/experiences';
-    let urlExperienceUpdate = urlExperiences + '/' + experienceCreated.toString();
+    let urlExperiences = endpointAPI + '/users/' + userId + '/experiences' + '?schema=' + this.state.config.schema;
+    let urlExperienceUpdate = urlExperiences + '/' + experienceCreated.toString() + '?schema=' + this.state.config.schema;
     console.log('Starting experience update for prediction result: ', urlExperienceUpdate);
     axios.put(urlExperienceUpdate, {
       comfort_level_result: result,
@@ -237,8 +236,8 @@ class WeatherScreen extends Component {
     let upper_clothing = this.state.experience.upper_clothing;
     let lower_clothing = this.state.experience.lower_clothing;
 
-    let urlExperiences = endpointAPI + '/users/' + userId + '/experiences';
-    let urlPredict = endpointML + '/infer';
+    let urlExperiences = endpointAPI + '/users/' + userId + '/experiences' + '?schema=' + this.state.config.schema;
+    let urlPredict = endpointML + '/infer' + '?schema=' + this.state.config.schema;
 
     this.setState({
       disabledControls: {...this.state.disabledControls,
@@ -276,7 +275,7 @@ class WeatherScreen extends Component {
 
             // Start update experience with prediction result
             let comfortPredict = response.data[0].comfortable;
-            let urlExperienceUpdate = urlExperiences + '/' + experienceCreated.toString();
+            let urlExperienceUpdate = urlExperiences + '/' + experienceCreated.toString() + '?schema=' + this.state.config.schema;
             console.log('Starting experience update: ', urlExperienceUpdate);
             axios.put(urlExperienceUpdate, {
               zip: zip,
@@ -318,7 +317,7 @@ class WeatherScreen extends Component {
     let endpointAPI = this.state.config.endpointAPI;
     let authToken = this.state.config.authToken;
 
-    let urlZipfromlatlong = endpointAPI + '/locations/zipFromLatLong';
+    let urlZipfromlatlong = endpointAPI + '/locations/zipFromLatLong' + '?schema=' + this.state.config.schema;
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
