@@ -235,9 +235,10 @@ class WeatherScreen extends Component {
     let activity = this.state.experience.activity;
     let upper_clothing = this.state.experience.upper_clothing;
     let lower_clothing = this.state.experience.lower_clothing;
+    let schema = this.state.config.schema;
 
-    let urlExperiences = endpointAPI + '/users/' + userId + '/experiences' + '?schema=' + this.state.config.schema;
-    let urlPredict = endpointML + '/infer' + '?schema=' + this.state.config.schema;
+    let urlExperiences = endpointAPI + '/users/' + userId + '/experiences' + '?schema=' + schema;
+    let urlPredict = endpointML + '/infer' + '?schema=' + schema;
 
     this.setState({
       disabledControls: {...this.state.disabledControls,
@@ -275,7 +276,7 @@ class WeatherScreen extends Component {
 
             // Start update experience with prediction result
             let comfortPredict = response.data[0].comfortable;
-            let urlExperienceUpdate = urlExperiences + '/' + experienceCreated.toString() + '?schema=' + this.state.config.schema;
+            let urlExperienceUpdate = urlExperiences + '/' + experienceCreated.toString() + '?schema=' + schema;
             console.log('Starting experience update: ', urlExperienceUpdate);
             axios.put(urlExperienceUpdate, {
               zip: zip,
