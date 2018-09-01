@@ -10,6 +10,7 @@ import axios from 'axios';
 import WibsieConfig from '../Config/WibsieConfig'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
+import UserActions from '../Redux/UserRedux'
 
 // Styles
 import styles from './Styles/LoginScreenStyle'
@@ -42,6 +43,13 @@ class LoginScreen extends Component {
         });
         // Add to persistent storage
         storeUserLocal();
+
+        // Add to redux
+        var blend = null;
+        if (data.hasOwnProperty('model')) {
+          blend = data.model.model_blend_pct
+        }
+        this.props.setUser(data.id, blend, data.email);
       };
 
       storeUserLocal = async () => {
@@ -183,12 +191,17 @@ class LoginScreen extends Component {
 }
 
 const mapStateToProps = (state) => {
+  console.log('mapStateToProps: ', state);
   return {
+    id: state.user.id,
+    blend: state.user.blend,
+    email: state.user.email
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    setUser: (id, blend, email) => dispatch(UserActions.userUpdate(id, blend, email))
   }
 }
 
