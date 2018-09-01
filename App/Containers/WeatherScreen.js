@@ -11,6 +11,7 @@ import WibsieConfig from '../Config/WibsieConfig'
 
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
+import LocationActions from '../Redux/LocationRedux'
 
 // Styles
 import styles from './Styles/WeatherScreenStyle'
@@ -116,6 +117,7 @@ class WeatherScreen extends Component {
     };
 
     updateLocationData = (data) => {
+      this.props.setZip(data.zip);
       this.setState({
         location: {...this.state.location,
                     zip: data.zip}
@@ -165,11 +167,20 @@ class WeatherScreen extends Component {
   _getWeather() {
     let endpointAPI = this.state.config.endpointAPI;
     let authToken = this.state.config.authToken;
-    let zip = this.state.location.zip;
+    let zip = this.props.zip;
 
-    if (zip == '--') {
-      console.log('No zip loaded, running _updateCurrentPosition');
+    if (zip == '' | zip == null) {
+      console.error('No zip loaded');
       this._updateCurrentPosition();
+      Alert.alert(
+        'Error',
+        'No location loaded',
+        [
+          {text: 'OK', onPress: () => {}},
+        ],
+        { cancelable: false }
+      );
+      return;
     }
 
     let url = endpointAPI + '/weatherreports?epoch=now&location=' + zip + '&schema=' + this.state.config.schema;
@@ -231,7 +242,7 @@ class WeatherScreen extends Component {
     let endpointML = this.state.config.endpointML;
     let userId = this.state.user.id;
     let weatherExpires = this.state.weather.expires;
-    let zip = this.state.location.zip;
+    let zip = this.props.zip;
     let activity = this.state.experience.activity;
     let upper_clothing = this.state.experience.upper_clothing;
     let lower_clothing = this.state.experience.lower_clothing;
@@ -315,6 +326,14 @@ class WeatherScreen extends Component {
   }
 
   _updateCurrentPosition() {
+    console.log('Starting _updateCurrentPosition');
+
+    if (this.props.override) {
+      console.log('Ignoring _updateCurrentPosition due to override, but calling _getWeather');
+      this._getWeather();
+      return;
+    }
+
     let endpointAPI = this.state.config.endpointAPI;
     let authToken = this.state.config.authToken;
 
@@ -349,7 +368,14 @@ class WeatherScreen extends Component {
 
   componentDidMount() {
     loadUserData(this.props.navigation.state.params.user);
-    this._updateCurrentPosition();
+
+    this.subs = [
+      this.props.navigation.addListener('didFocus', () => this._updateCurrentPosition()),
+    ];
+  }
+
+  componentWillUnmount() {
+      this.subs.forEach(sub => sub.remove());
   }
 
   static navigationOptions = ({navigation, state}) => {
@@ -402,7 +428,7 @@ class WeatherScreen extends Component {
           </View>
         </View>
         <View style={styles.weatherInfoRow}>
-          <Text style={styles.weatherInfoText}>{this.state.location.zip+'  \u00B7  '+this.state.weatherCreatedLocal}</Text>
+          <Text style={styles.weatherInfoText}>{(this.props.zip==null ? '--':this.props.zip) +'  \u00B7  '+this.state.weatherCreatedLocal}</Text>
         </View>
         <View style={styles.pickerRow}>
           <Picker
@@ -482,12 +508,16 @@ class WeatherScreen extends Component {
 }
 
 const mapStateToProps = (state) => {
+  console.log('mapStateToProps: ', state);
   return {
+    zip: state.location.zip,
+    override: state.location.override
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    setZip: (zip) => dispatch(LocationActions.changeZip(zip))
   }
 }
 
