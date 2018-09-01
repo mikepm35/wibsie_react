@@ -40,7 +40,8 @@ class WeatherScreen extends Component {
                         upper_clothing: 'long_sleeves',
                         lower_clothing: 'shorts'},
       prediction: {primaryPercent: '--',
-                    primaryResult: '--'}
+                    primaryResult: '--',
+                    blendPercent: '--'}
     }
 
     loadUserData = (data) => {
@@ -147,11 +148,17 @@ class WeatherScreen extends Component {
         var primaryResult = 'Uncomfortable';
       }
 
+      var blendPercent = '0.0';
+      if (data[0].blend!=null) {
+        blendPercent = (data[0].blend*100).toFixed(1);
+      }
+
       this.setState({
         prediction: {comfortPredict: comfortPredict,
                       uncomfortPredict: uncomfortPredict,
                       primaryPercent: primaryPercent,
-                      primaryResult: primaryResult},
+                      primaryResult: primaryResult,
+                      blendPercent: blendPercent},
         disabledControls: {...this.state.disabledControls,
                             experiencePicker: true,
                             predictionButton: true,
@@ -248,7 +255,7 @@ class WeatherScreen extends Component {
     let lower_clothing = this.state.experience.lower_clothing;
     let schema = this.state.config.schema;
 
-    let urlExperiences = endpointAPI + '/users/' + userId + '/experiences' + '?schema=' + schema;
+    let urlExperiences = endpointAPI + '/users/' + userId + '/experiences';
     let urlPredict = endpointML + '/infer' + '?schema=' + schema;
 
     this.setState({
@@ -261,7 +268,7 @@ class WeatherScreen extends Component {
     });
 
     // Start create experience
-    axios.post(urlExperiences, {
+    axios.post(urlExperiences + '?schema=' + schema, {
         zip: zip,
         weather_expiration: weatherExpires,
         activity: activity,
@@ -287,9 +294,9 @@ class WeatherScreen extends Component {
 
             // Start update experience with prediction result
             let comfortPredict = response.data[0].comfortable;
-            let urlExperienceUpdate = urlExperiences + '/' + experienceCreated.toString() + '?schema=' + schema;
+            let urlExperienceUpdate = urlExperiences + '/' + experienceCreated.toString();
             console.log('Starting experience update: ', urlExperienceUpdate);
-            axios.put(urlExperienceUpdate, {
+            axios.put(urlExperienceUpdate + '?schema=' + schema, {
               zip: zip,
               weather_expiration: weatherExpires,
               activity: activity,
@@ -325,10 +332,13 @@ class WeatherScreen extends Component {
       });
   }
 
-  _updateCurrentPosition() {
+  _updateCurrentPosition(reset) {
     console.log('Starting _updateCurrentPosition');
 
-    if (this.props.override) {
+    if (this.state.prediction.primaryPercent != '--' & reset != true) {
+      console.log('Ignoring _updateCurrentPosition due to prediction already loaded');
+      return;
+    } else if (this.props.override) {
       console.log('Ignoring _updateCurrentPosition due to override, but calling _getWeather');
       this._getWeather();
       return;
@@ -467,7 +477,7 @@ class WeatherScreen extends Component {
             <RoundedButton
               disabled={false}
               showActivityIndicator={this.state.disabledControls.showPredictionButtonActivity}
-              onPress={() => this._getWeather()}>
+              onPress={() => this._updateCurrentPosition(true)}>
               Reset
             </RoundedButton>
           ) : (
@@ -508,7 +518,7 @@ class WeatherScreen extends Component {
 }
 
 const mapStateToProps = (state) => {
-  console.log('mapStateToProps: ', state);
+  //console.log('mapStateToProps: ', state);
   return {
     zip: state.location.zip,
     override: state.location.override

@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 import LocationActions from '../Redux/LocationRedux'
+import UserActions from '../Redux/UserRedux'
 
 // Styles
 import styles from './Styles/SettingsScreenStyle'
@@ -59,18 +60,23 @@ class SettingsScreen extends Component {
     } catch (error) {
       console.log('Error deleting user data from local: ', error);
     }
+
+    this.props.setZip(null);
+    this.props.setOverride(false);
+    this.props.setUser(null, null, null);
    };
 
    _updateZipSave = (zip) => {
      var isnum = /^\d+$/.test(zip);
      var saved = false;
 
-     this.props.setZip(null);
-     this.props.setOverride(false);
-
      if (zip==null | zip=='') {
        var color = Colors.charcoal;
        var icon = 'radio-button-unchecked';
+       if (this.props.override) {
+         this.props.setZip(null);
+         this.props.setOverride(false);
+       }
      } else {
        if (zip.length == 5 & isnum) {
          var color = Colors.green;
@@ -156,7 +162,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     setZip: (zip) => dispatch(LocationActions.changeZip(zip)),
-    setOverride: (override) => dispatch(LocationActions.changeOverride(override))
+    setOverride: (override) => dispatch(LocationActions.changeOverride(override)),
+    setUser: (id, blend, email) => dispatch(UserActions.userUpdate(id, blend, email))
   }
 }
 
