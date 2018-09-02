@@ -6,6 +6,7 @@ import RoundedButton from '../../App/Components/RoundedButton';
 import WibsieConfig from '../Config/WibsieConfig'
 import { Colors } from '../Themes/'
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import * as Progress from 'react-native-progress';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
 import LocationActions from '../Redux/LocationRedux'
@@ -119,6 +120,8 @@ class SettingsScreen extends Component {
   };
 
   render () {
+    let blendPercent = (this.props.blend*100).toFixed(1);
+
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.row}>
@@ -136,8 +139,15 @@ class SettingsScreen extends Component {
           </View>
         </View>
         <View style={styles.row}>
+          <Text style={styles.inputLabel}>User contribution to model:</Text>
+          <View style={styles.inputIconRow}>
+            <Progress.Bar style={styles.progress} progress={this.props.blend} height={20} width={200} animated={true} color={'white'} animationType={'spring'} />
+            <Text style={styles.progressLabel}>{blendPercent}%</Text>
+          </View>
+        </View>
+        <View style={styles.row}>
           <Text style={styles.inputLabel}>Logged in as:</Text>
-          <Text style={styles.emailText}>{this.state.user.email}</Text>
+          <Text style={styles.emailText}>{this.props.email}</Text>
         </View>
         <View style={styles.logoutButtonRow}>
           <RoundedButton
@@ -152,10 +162,13 @@ class SettingsScreen extends Component {
 }
 
 const mapStateToProps = (state) => {
-  console.log('mapStateToProps: ', state);
+  //console.log('mapStateToProps: ', state);
   return {
     zip: state.location.zip,
-    override: state.location.override
+    override: state.location.override,
+    id: state.user.id,
+    blend: state.user.blend,
+    email: state.user.email
   }
 }
 
