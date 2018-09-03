@@ -21,7 +21,9 @@ class LoginScreen extends Component {
       this.state = {
         config: WibsieConfig,
         user: {email: '',
-                password: ''}
+                password: ''},
+        disabledControls: {loginDisabled: false,
+                            loginActivity: false}
       }
 
       resetInputs = () => {
@@ -29,6 +31,22 @@ class LoginScreen extends Component {
           user: {email: '',
                   password: ''}
         });
+      };
+
+      updateLoginActivity = (active) => {
+        if (active) {
+          this.setState({
+            disabledControls: {...this.state.disabledControls,
+                    loginDisabled: true,
+                    loginActivity: true}
+          });
+        } else {
+          this.setState({
+            disabledControls: {...this.state.disabledControls,
+                    loginDisabled: false,
+                    loginActivity: false}
+          });
+        }
       };
 
       updateUserData = (data) => {
@@ -65,6 +83,8 @@ class LoginScreen extends Component {
   }
 
   _checkCredentials(navigation) {
+    updateLoginActivity(true);
+
     let urlUserQuery = this.state.config.endpointAPI + '/users/query' + '?schema=' + this.state.config.schema;
 
     // Validate if email is an email
@@ -101,6 +121,7 @@ class LoginScreen extends Component {
         console.log('Success user query: ', response);
         updateUserData(response.data);
         navigation.navigate('WeatherScreen', {user: response.data});
+        updateLoginActivity(false);
       })
       .catch(function (error) {
         console.log('Error user query: ', error);
@@ -118,6 +139,7 @@ class LoginScreen extends Component {
           ],
           { cancelable: false }
         )
+        updateLoginActivity(false);
       });
   };
 
@@ -193,7 +215,8 @@ class LoginScreen extends Component {
             value={this.state.user.password}
           />
           <RoundedButtonDark
-            disabled={false}
+            disabled={this.state.disabledControls.loginDisabled}
+            showActivityIndicator={this.state.disabledControls.loginActivity}
             onPress={() => this._checkCredentials(this.props.navigation)}>
             Login
           </RoundedButtonDark>

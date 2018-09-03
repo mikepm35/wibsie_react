@@ -29,7 +29,13 @@ export default StyleSheet.create({
     color: Colors.snow,
     textAlign: 'center',
     fontSize: 54,
-    marginVertical: Metrics.smallMargin
+    marginTop: Metrics.smallMargin
+  },
+  tempTextSmall: {
+    ...Fonts.style.normal,
+    color: Colors.snow,
+    marginBottom: Metrics.smallMargin,
+    textAlign: 'center'
   },
   weatherText: {
     ...Fonts.style.normal,
