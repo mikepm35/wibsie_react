@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, SafeAreaView, View, TextInput, Picker, Alert } from 'react-native'
+import { AsyncStorage, Text, SafeAreaView, View, TextInput, Picker, Alert } from 'react-native'
 import { StackNavigator } from 'react-navigation'
 import { Colors } from '../Themes/'
 import { connect } from 'react-redux'
@@ -8,6 +8,7 @@ import axios from 'axios'
 import WibsieConfig from '../Config/WibsieConfig'
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
+import UserActions from '../Redux/UserRedux'
 
 const calendar = require('../Lib/calendar.js');
 
@@ -33,12 +34,31 @@ class SignupScreen extends Component {
                       showCreateButtonActivity: false}
     }
 
-    addUserId = (id) => {
+    updateUserData = (data) => {
       this.setState({
         user: {...this.state.user,
-                id: id}
+                id: data.id}
       });
+      // Add to persistent storage
+      storeUserLocal();
+
+      // Add to redux
+      var blend = null;
+      if (data.hasOwnProperty('model')) {
+        blend = data.model.model_blend_pct
+      }
+      this.props.setUser(data.id, blend, data.email);
     };
+
+    storeUserLocal = async () => {
+      try {
+        console.log('Storing user state locally: ', this.state.user);
+        await AsyncStorage.setItem('wibsie:userid', this.state.user.id);
+        await AsyncStorage.setItem('wibsie:useremail', this.state.user.email);
+      } catch (error) {
+        console.log('Error storing user from login: ', error);
+      }
+    }
 
     resetInputs = () => {
       this.setState({
@@ -126,7 +146,7 @@ class SignupScreen extends Component {
       }, {headers: {'AuthToken': authToken}})
       .then(function (response) {
         console.log('Success user create: ', response);
-        addUserId(response.data.id);
+        updateUserData(response.data);
         navigation.navigate('WeatherScreen', {user: response.data});
         updateCreateActivity(false);
       })
@@ -316,12 +336,17 @@ class SignupScreen extends Component {
 }
 
 const mapStateToProps = (state) => {
+  //console.log('mapStateToProps: ', state);
   return {
+    id: state.user.id,
+    blend: state.user.blend,
+    email: state.user.email
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    setUser: (id, blend, email) => dispatch(UserActions.userUpdate(id, blend, email))
   }
 }
 
