@@ -8,6 +8,7 @@ import RoundedButton from '../../App/Components/RoundedButton'
 import RoundedButtonExp from '../../App/Components/RoundedButtonExp'
 import { DotIndicator } from 'react-native-indicators';
 import WibsieConfig from '../Config/WibsieConfig'
+import { Metrics } from '../Themes/'
 
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
@@ -33,8 +34,11 @@ class WeatherScreen extends Component {
                     error: null},
       weatherCreatedLocal: '--',
       weather: {temperature: '--',
+                tempHigh: '--',
+                tempLow: '--',
                 summary: '--',
                 humidity: '--',
+                precipProbability: '--',
                 windSpeed: '--'},
       experience: {activity: 'standing',
                         upper_clothing: 'long_sleeves',
@@ -99,12 +103,27 @@ class WeatherScreen extends Component {
     };
 
     updateWeatherData = (data) => {
+      // Attempt to pull high / low temp from raw data
+      try {
+        var tempHigh = data.raw.daily.data[0].temperatureHigh.toFixed(0);
+        var tempLow = data.raw.daily.data[0].temperatureLow.toFixed(0);
+      } catch(err) {
+        console.log('Error fetching tempHigh/Low');
+        var tempHigh = '--';
+        var tempLow = '--';
+      }
+
+      console.log('Retrieved tempHigh/Low: ', tempHigh, tempLow);
+
       this.setState({
         weather: {created: data.created,
                   expires: data.expires,
                   temperature: data.temperature.toFixed(0),
+                  tempHigh: tempHigh,
+                  tempLow: tempLow,
                   summary: data.summary,
                   humidity: (data.humidity*100).toFixed(0),
+                  precipProbability: (data.precipProbability*100).toFixed(0),
                   windSpeed: data.windSpeed.toFixed(1)},
         disabledControls: {...this.state.disabledControls,
                             experiencePicker: false,
@@ -176,7 +195,7 @@ class WeatherScreen extends Component {
     let authToken = this.state.config.authToken;
     let zip = this.props.zip;
 
-    if (zip == '' | zip == null) {
+    if (zip == '' | zip == null | zip == '--') {
       console.error('No zip loaded');
       this._updateCurrentPosition();
       Alert.alert(
@@ -226,7 +245,7 @@ class WeatherScreen extends Component {
     });
 
     // Start update experience with prediction result
-    let urlExperiences = endpointAPI + '/users/' + userId + '/experiences' + '?schema=' + this.state.config.schema;
+    let urlExperiences = endpointAPI + '/users/' + userId + '/experiences';
     let urlExperienceUpdate = urlExperiences + '/' + experienceCreated.toString() + '?schema=' + this.state.config.schema;
     console.log('Starting experience update for prediction result: ', urlExperienceUpdate);
     axios.put(urlExperienceUpdate, {
@@ -413,7 +432,7 @@ class WeatherScreen extends Component {
       'long_sleeves': 'Long Sleeves',
       'short_sleeves': 'Short Sleeves',
       'jacket': 'Jacket',
-      'no_shirt': 'No Shirt'
+      'tank': 'Tank Top'
     };
     const upperClothingKeys = Object.keys(upperClothingOptions);
 
@@ -429,16 +448,21 @@ class WeatherScreen extends Component {
           <View style={styles.weatherCols}>
             <TouchableOpacity style={{paddingHorizontal: 10}} onPress={()=>this._getWeather()}>
               <Text style={styles.tempText}>{this.state.weather.temperature+'\u00B0'}</Text>
+              <Text style={styles.tempTextSmall}>H:{this.state.weather.tempHigh+'\u00B0'} L:{this.state.weather.tempLow+'\u00B0'}</Text>
             </TouchableOpacity>
           </View>
           <View style={styles.weatherCols}>
             <Text style={styles.weatherText}>{this.state.weather.summary}</Text>
-            <Text style={styles.weatherText}>{this.state.weather.windSpeed} mph</Text>
+            <Text style={styles.weatherText}>{this.state.weather.precipProbability}% Precipitation</Text>
             <Text style={styles.weatherText}>{this.state.weather.humidity}% Humidity</Text>
           </View>
         </View>
         <View style={styles.weatherInfoRow}>
-          <Text style={styles.weatherInfoText}>{(this.props.zip==null ? '--':this.props.zip) +'  \u00B7  '+this.state.weatherCreatedLocal}</Text>
+          {(Metrics.aspectRatio > 1.6 & Metrics.height > 650) ? (
+            <Text style={styles.weatherInfoText}>{(this.props.zip==null ? '--':this.props.zip) +'  \u00B7  '+this.state.weatherCreatedLocal}</Text>
+          ) : (
+            <Text></Text>
+          )}
         </View>
         <View style={styles.pickerRow}>
           <Picker

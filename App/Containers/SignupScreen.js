@@ -28,7 +28,9 @@ class SignupScreen extends Component {
               gender: 'male',
               height_in: '60',
               weight_lb: 150,
-              lifestyle: 'moderate_activity'}
+              lifestyle: 'moderate_activity'},
+    disabledControls: {createButton: false,
+                      showCreateButtonActivity: false}
     }
 
     addUserId = (id) => {
@@ -46,9 +48,27 @@ class SignupScreen extends Component {
       });
     };
 
+    updateCreateActivity = (active) => {
+      if (active) {
+        this.setState({
+          disabledControls: {...this.state.disabledControls,
+                  createButton: true,
+                  showCreateButtonActivity: true}
+        });
+      } else {
+        this.setState({
+          disabledControls: {...this.state.disabledControls,
+                  createButton: false,
+                  showCreateButtonActivity: false}
+        });
+      }
+    };
+
   }
 
   _createAccount(navigation) {
+    updateCreateActivity(true);
+
     let urlUser = this.state.config.endpointAPI + '/users' + '?schema=' + this.state.config.schema;
     let authToken = this.state.config.authToken;
 
@@ -62,6 +82,7 @@ class SignupScreen extends Component {
         ],
         { cancelable: false }
       )
+      updateCreateActivity(false);
       return;
     }
 
@@ -75,6 +96,7 @@ class SignupScreen extends Component {
         ],
         { cancelable: false }
       )
+      updateCreateActivity(false);
       return;
     }
 
@@ -88,6 +110,7 @@ class SignupScreen extends Component {
         ],
         { cancelable: false }
       )
+      updateCreateActivity(false);
       return;
     }
 
@@ -105,6 +128,7 @@ class SignupScreen extends Component {
         console.log('Success user create: ', response);
         addUserId(response.data.id);
         navigation.navigate('WeatherScreen', {user: response.data});
+        updateCreateActivity(false);
       })
       .catch(function (error) {
         console.log('Error user create: ', error);
@@ -121,6 +145,7 @@ class SignupScreen extends Component {
           ],
           { cancelable: false }
         )
+        updateCreateActivity(false);
       });
   };
 
@@ -279,7 +304,8 @@ class SignupScreen extends Component {
         </View>
         <View>
           <RoundedButton
-            disabled={false}
+            disabled={this.state.disabledControls.createButton}
+            showActivityIndicator={this.state.disabledControls.showCreateButtonActivity}
             onPress={() => this._createAccount(this.props.navigation)}>
             Create Account
           </RoundedButton>

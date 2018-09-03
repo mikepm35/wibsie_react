@@ -21,7 +21,9 @@ class LoginScreen extends Component {
       this.state = {
         config: WibsieConfig,
         user: {email: '',
-                password: ''}
+                password: ''},
+        disabledControls: {loginDisabled: false,
+                            loginActivity: false}
       }
 
       resetInputs = () => {
@@ -29,6 +31,22 @@ class LoginScreen extends Component {
           user: {email: '',
                   password: ''}
         });
+      };
+
+      updateLoginActivity = (active) => {
+        if (active) {
+          this.setState({
+            disabledControls: {...this.state.disabledControls,
+                    loginDisabled: true,
+                    loginActivity: true}
+          });
+        } else {
+          this.setState({
+            disabledControls: {...this.state.disabledControls,
+                    loginDisabled: false,
+                    loginActivity: false}
+          });
+        }
       };
 
       updateUserData = (data) => {
@@ -54,6 +72,7 @@ class LoginScreen extends Component {
 
       storeUserLocal = async () => {
         try {
+          console.log('Storing user state locally: ', this.state.user);
           await AsyncStorage.setItem('wibsie:userid', this.state.user.id);
           await AsyncStorage.setItem('wibsie:useremail', this.state.user.email);
         } catch (error) {
@@ -64,6 +83,8 @@ class LoginScreen extends Component {
   }
 
   _checkCredentials(navigation) {
+    updateLoginActivity(true);
+
     let urlUserQuery = this.state.config.endpointAPI + '/users/query' + '?schema=' + this.state.config.schema;
 
     // Validate if email is an email
@@ -100,6 +121,7 @@ class LoginScreen extends Component {
         console.log('Success user query: ', response);
         updateUserData(response.data);
         navigation.navigate('WeatherScreen', {user: response.data});
+        updateLoginActivity(false);
       })
       .catch(function (error) {
         console.log('Error user query: ', error);
@@ -117,14 +139,32 @@ class LoginScreen extends Component {
           ],
           { cancelable: false }
         )
+        updateLoginActivity(false);
       });
   };
+
+  _loadUserFromId(userid) {
+    let url = this.state.config.endpointAPI + '/users/' + userid + '?schema=' + this.state.config.schema;
+    console.log('User id get url: ', url);
+
+    axios.get(url, {headers: {'AuthToken': this.state.config.authToken}})
+      .then(function (response) {
+        console.log('Success userid query', response);
+        updateUserData(response.data);
+      })
+      .catch(function (error) {
+        console.error('Error fetching user from id: ', error, error.request);
+      });
+  }
 
   _getUserFromLocal = async () => {
     try {
       const userid = await AsyncStorage.getItem('wibsie:userid');
       if (userid !== null) {
         console.log('Retrieved user data from local: ', userid);
+        // Hit api to pull user info
+        this._loadUserFromId(userid);
+        // Navigate away
         this.props.navigation.navigate('WeatherScreen', {user: {id: userid}});
       } else {
         console.log('No userid retrieved from local');
@@ -175,7 +215,8 @@ class LoginScreen extends Component {
             value={this.state.user.password}
           />
           <RoundedButtonDark
-            disabled={false}
+            disabled={this.state.disabledControls.loginDisabled}
+            showActivityIndicator={this.state.disabledControls.loginActivity}
             onPress={() => this._checkCredentials(this.props.navigation)}>
             Login
           </RoundedButtonDark>
@@ -191,7 +232,7 @@ class LoginScreen extends Component {
 }
 
 const mapStateToProps = (state) => {
-  console.log('mapStateToProps: ', state);
+  //console.log('mapStateToProps: ', state);
   return {
     id: state.user.id,
     blend: state.user.blend,

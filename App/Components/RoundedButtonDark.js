@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { TouchableOpacity, Text } from 'react-native'
 import styles from './Styles/RoundedButtonDarkStyle'
+import { DotIndicator } from 'react-native-indicators';
 import ExamplesRegistry from '../Services/ExamplesRegistry'
 
 // Note that this file (App/Components/RoundedButton) needs to be
@@ -23,6 +24,7 @@ export default class RoundedButtonDark extends Component {
     disabled: PropTypes.bool,
     text: PropTypes.string,
     children: PropTypes.string,
+    showActivityIndicator: PropTypes.bool,
     navigator: PropTypes.object
   }
 
@@ -37,7 +39,11 @@ export default class RoundedButtonDark extends Component {
         style={this.props.disabled ? styles.buttonDisabled : styles.button}
         onPress={this.props.onPress}
         disabled={this.props.disabled}>
-        <Text style={this.props.disabled ? styles.buttonTextDisabled : styles.buttonText}>{this.getText()}</Text>
+        {this.props.showActivityIndicator ? (
+          <DotIndicator color='white' />
+        ) : (
+          <Text style={this.props.disabled ? styles.buttonTextDisabled : styles.buttonText}>{this.getText()}</Text>
+        )}
       </TouchableOpacity>
     )
   }

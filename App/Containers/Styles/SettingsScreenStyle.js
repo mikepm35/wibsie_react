@@ -24,7 +24,7 @@ export default StyleSheet.create({
   },
   inputIconRow: {
     flex: 2,
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   icon: {
     height: (Metrics.aspectRatio > 1.6) ? 40 : 30,
@@ -34,8 +34,25 @@ export default StyleSheet.create({
     marginRight: Metrics.section
   },
   row: {
-    flex: 2,
-    paddingVertical: Metrics.section
+    flex: 1,
+    paddingVertical: Metrics.section,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  progress: {
+    paddingHorizontal: Metrics.smallMargin,
+    marginHorizontal: Metrics.section,
+    marginVertical: Metrics.baseMargin,
+    height: 20
+  },
+  progressLabel: {
+    ...Fonts.style.normal,
+    color: Colors.snow,
+    marginVertical: Metrics.smallMargin,
+    textAlign: 'center',
+    paddingRight: Metrics.smallMargin,
+    marginRight: Metrics.section,
+    textAlignVertical: 'center',
   },
   emailText: {
     ...Fonts.style.normal,
@@ -45,6 +62,6 @@ export default StyleSheet.create({
   },
   logoutButtonRow: {
     paddingVertical: Metrics.section,
-    marginBottom: Metrics.section * 10
+    marginBottom: Metrics.section * 5
   },
 })
