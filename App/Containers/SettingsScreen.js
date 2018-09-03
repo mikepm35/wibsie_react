@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { AsyncStorage, SafeAreaView, Text, View, TextInput } from 'react-native'
+import { AsyncStorage, SafeAreaView, Text, View, TextInput, Alert } from 'react-native'
 import { StackNavigator } from 'react-navigation'
 import { connect } from 'react-redux'
 import RoundedButton from '../../App/Components/RoundedButton';
 import WibsieConfig from '../Config/WibsieConfig'
 import { Colors } from '../Themes/'
+import axios from 'axios'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as Progress from 'react-native-progress';
 // Add Actions - replace 'Your' with whatever your reducer is called :)
@@ -38,6 +39,14 @@ class SettingsScreen extends Component {
       }
     }
 
+    updateUserData = (data) => {
+      var blend = null;
+      if (data.hasOwnProperty('model')) {
+        blend = data.model.model_blend_pct
+      }
+      this.props.setBlend(blend);
+    };
+
     updateUserFromLocal = async () => {
       try {
         var userid = await AsyncStorage.getItem('wibsie:userid');
@@ -58,13 +67,20 @@ class SettingsScreen extends Component {
       await AsyncStorage.removeItem('wibsie:userid');
       await AsyncStorage.removeItem('wibsie:useremail');
       this.props.navigation.navigate('LoginScreen');
+      this.props.setZip(null);
+      this.props.setOverride(false);
+      this.props.setUser(null, null, null);
     } catch (error) {
       console.log('Error deleting user data from local: ', error);
+      Alert.alert(
+        'Error',
+        'Please try logging out again.',
+        [
+          {text: 'OK', onPress: () => {}},
+        ],
+        { cancelable: false }
+      );
     }
-
-    this.props.setZip(null);
-    this.props.setOverride(false);
-    this.props.setUser(null, null, null);
    };
 
    _updateZipSave = (zip) => {
@@ -100,14 +116,32 @@ class SettingsScreen extends Component {
      });
    }
 
+   _loadUserFromId(userid) {
+     let url = this.state.config.endpointAPI + '/users/' + userid + '?schema=' + this.state.config.schema;
+     console.log('User id get url: ', url);
+
+     axios.get(url, {headers: {'AuthToken': this.state.config.authToken}})
+       .then(function (response) {
+         console.log('Success userid query', response);
+         updateUserData(response.data);
+       })
+       .catch(function (error) {
+         console.error('Error fetching user from id: ', error, error.request);
+       });
+   }
+
    componentDidMount() {
-     updateUserFromLocal();
+     //updateUserFromLocal();
      if (this.props.override == true) {
        this._updateZipSave(this.props.zip);
      }
+     this.subs = [
+       this.props.navigation.addListener('didFocus', () => this._loadUserFromId(this.props.id)),
+     ];
   }
 
   componentWillUnmount() {
+    this.subs.forEach(sub => sub.remove());
   }
 
   static navigationOptions = ({navigation}) => {
@@ -176,7 +210,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     setZip: (zip) => dispatch(LocationActions.changeZip(zip)),
     setOverride: (override) => dispatch(LocationActions.changeOverride(override)),
-    setUser: (id, blend, email) => dispatch(UserActions.userUpdate(id, blend, email))
+    setUser: (id, blend, email) => dispatch(UserActions.userUpdate(id, blend, email)),
+    setBlend: (blend) => dispatch(UserActions.changeBlend(blend))
   }
 }
 
