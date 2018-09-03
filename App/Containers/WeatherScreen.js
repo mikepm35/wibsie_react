@@ -8,6 +8,7 @@ import RoundedButton from '../../App/Components/RoundedButton'
 import RoundedButtonExp from '../../App/Components/RoundedButtonExp'
 import { DotIndicator } from 'react-native-indicators';
 import WibsieConfig from '../Config/WibsieConfig'
+import { Metrics } from '../Themes/'
 
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
@@ -457,7 +458,11 @@ class WeatherScreen extends Component {
           </View>
         </View>
         <View style={styles.weatherInfoRow}>
-          <Text style={styles.weatherInfoText}>{(this.props.zip==null ? '--':this.props.zip) +'  \u00B7  '+this.state.weatherCreatedLocal}</Text>
+          {(Metrics.aspectRatio > 1.6 & Metrics.height > 650) ? (
+            <Text style={styles.weatherInfoText}>{(this.props.zip==null ? '--':this.props.zip) +'  \u00B7  '+this.state.weatherCreatedLocal}</Text>
+          ) : (
+            <Text></Text>
+          )}
         </View>
         <View style={styles.pickerRow}>
           <Picker

@@ -24,7 +24,7 @@ export default StyleSheet.create({
   },
   inputIconRow: {
     flex: 2,
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   icon: {
     height: (Metrics.aspectRatio > 1.6) ? 40 : 30,
@@ -43,6 +43,7 @@ export default StyleSheet.create({
     paddingHorizontal: Metrics.smallMargin,
     marginHorizontal: Metrics.section,
     marginVertical: Metrics.baseMargin,
+    height: 20
   },
   progressLabel: {
     ...Fonts.style.normal,
