@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ScrollView, Text, View, SafeAreaView, Picker, Button, TouchableHighlight, TouchableOpacity, Alert } from 'react-native'
+import { ScrollView, Text, View, SafeAreaView, Picker, Button, TouchableHighlight, TouchableOpacity, Alert, RefreshControl } from 'react-native'
 import { StackNavigator } from 'react-navigation'
 import { connect } from 'react-redux'
 import axios from 'axios'
@@ -19,9 +19,11 @@ import styles from './Styles/WeatherScreenStyle'
 
 class WeatherScreen extends Component {
   constructor (props) {
-    super(props)
+    super(props);
     this.state = {
       config: WibsieConfig,
+      refreshing: false,
+      scrollEnabled: true,
       disabledControls: {experiencePicker: false,
                           predictionButton: true,
                           showReset: false,
@@ -46,6 +48,19 @@ class WeatherScreen extends Component {
       prediction: {primaryPercent: '--',
                     primaryResult: '--',
                     blendPercent: '--'}
+    };
+
+    setScrollEnabled = (scrollBool) => {
+      this.setState({
+        scrollEnabled: scrollBool
+      });
+    }
+
+    setRefreshing = (refreshBool) => {
+      console.log('Setting refreshing: ', refreshBool);
+      this.setState({
+        refreshing: refreshBool
+      });
     }
 
     loadUserData = (data) => {
@@ -190,6 +205,28 @@ class WeatherScreen extends Component {
 
   }
 
+  _onScroll = (event) => {
+    console.log('_onScroll event: ', event);
+    if (event && event.nativeEvent.contentOffset.y) {
+      console.log('_onScroll nativeEvent: ', event.nativeEvent);
+      if (event.nativeEvent.contentOffset.y > 0) {
+        this.refs.scrollView.scrollTo({x:0,y:0,animated:false});
+        setScrollEnabled(false);
+      } else {
+        setScrollEnabled(true);
+      }
+    } else {
+      console.log('Event empty for _onScroll');
+      this.refs.scrollView.scrollTo(0);
+      setScrollEnabled(true);
+    }
+  }
+
+  _onRefresh = () => {
+    setRefreshing(true);
+    this._getWeather();
+  }
+
   _getWeather() {
     let endpointAPI = this.state.config.endpointAPI;
     let authToken = this.state.config.authToken;
@@ -206,6 +243,7 @@ class WeatherScreen extends Component {
         ],
         { cancelable: false }
       );
+      setRefreshing(false);
       return;
     }
 
@@ -217,6 +255,7 @@ class WeatherScreen extends Component {
       .then(function (response) {
         console.log('Success', response);
         updateWeatherData(response.data);
+        setRefreshing(false);
       })
       .catch(function (error) {
         console.log('Error: ', error, error.request);
@@ -228,6 +267,7 @@ class WeatherScreen extends Component {
           ],
           { cancelable: false }
         );
+        setRefreshing(false);
       });
   }
 
@@ -445,6 +485,22 @@ class WeatherScreen extends Component {
 
     return (
       <SafeAreaView style={styles.weatherContainer}>
+        <ScrollView
+          scrollEnabled={this.state.scrollEnabled}
+          bounces={this.state.scrollEnabled}
+          scrollEventThrottle={1}
+          contentContainerStyle={{ paddingBottom: 100 }}
+          pinchGestureEnabled={false}
+          showsVerticalScrollIndicator={false}
+          onScroll={this._onScroll}
+          ref="scrollView"
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this._onRefresh}
+            />
+          }
+        >
         <View style={styles.weatherRow}>
           <View style={styles.weatherCols}>
             <TouchableOpacity style={{paddingHorizontal: 10}} onPress={()=>this._getWeather()}>
@@ -537,6 +593,7 @@ class WeatherScreen extends Component {
             👎 Warm
           </RoundedButtonExp>
         </View>
+        </ScrollView>
       </SafeAreaView>
     )
   }
