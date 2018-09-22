@@ -42,7 +42,7 @@ class WeatherScreen extends Component {
                 windSpeed: '--'},
       experience: {activity: 'standing',
                         upper_clothing: 'long_sleeves',
-                        lower_clothing: 'shorts'},
+                        lower_clothing: 'pants'},
       prediction: {primaryPercent: '--',
                     primaryResult: '--',
                     blendPercent: '--'}
@@ -429,16 +429,17 @@ class WeatherScreen extends Component {
     const activityKeys = Object.keys(activityOptions);
 
     const upperClothingOptions = {
-      'long_sleeves': 'Long Sleeves',
+      'tank': 'Tank Top',
       'short_sleeves': 'Short Sleeves',
-      'jacket': 'Jacket',
-      'tank': 'Tank Top'
+      'long_sleeves': 'Long Sleeves',
+      'light_jacket': 'Light Jacket',
+      'heavy_jacket': 'Heavy Jacket'
     };
     const upperClothingKeys = Object.keys(upperClothingOptions);
 
     const lowerClothingOptions = {
-      'shorts': 'Shorts',
-      'pants': 'Pants'
+      'shorts': 'Shorts/Skirt',
+      'pants': 'Pants/Dress'
     };
     const lowerClothingKeys = Object.keys(lowerClothingOptions);
 
