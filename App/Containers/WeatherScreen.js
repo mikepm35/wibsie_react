@@ -394,11 +394,21 @@ class WeatherScreen extends Component {
   _updateCurrentPosition(reset) {
     console.log('Starting _updateCurrentPosition');
 
+    let weatherExpired = false;
+    if (Date.now() > (this.state.weather.expires)) {
+      console.log('Setting weatherExpired to true');
+      weatherExpired = true;
+    }
+
     if (this.state.prediction.primaryPercent != '--' & reset != true) {
       console.log('Ignoring _updateCurrentPosition due to prediction already loaded');
       return;
     } else if (this.props.override) {
       console.log('Ignoring _updateCurrentPosition due to override, but calling _getWeather');
+      this._getWeather();
+      return;
+    } else if (weatherExpired & !this.state.disabledControls.showReset & !this.state.disabledControls.predictionButton) {
+      console.log('Updating weather due to expiration and no prediction');
       this._getWeather();
       return;
     }
