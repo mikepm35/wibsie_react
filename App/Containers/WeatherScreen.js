@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ScrollView, Text, View, SafeAreaView, Picker, Button, TouchableHighlight, TouchableOpacity, Alert } from 'react-native'
+import { ScrollView, Text, View, SafeAreaView, Picker, Button, TouchableHighlight, TouchableOpacity, Alert, RefreshControl } from 'react-native'
 import { StackNavigator } from 'react-navigation'
 import { connect } from 'react-redux'
 import axios from 'axios'
@@ -19,9 +19,11 @@ import styles from './Styles/WeatherScreenStyle'
 
 class WeatherScreen extends Component {
   constructor (props) {
-    super(props)
+    super(props);
     this.state = {
       config: WibsieConfig,
+      refreshing: false,
+      scrollEnabled: true,
       disabledControls: {experiencePicker: false,
                           predictionButton: true,
                           showReset: false,
@@ -42,10 +44,23 @@ class WeatherScreen extends Component {
                 windSpeed: '--'},
       experience: {activity: 'standing',
                         upper_clothing: 'long_sleeves',
-                        lower_clothing: 'shorts'},
+                        lower_clothing: 'pants'},
       prediction: {primaryPercent: '--',
                     primaryResult: '--',
                     blendPercent: '--'}
+    };
+
+    setScrollEnabled = (scrollBool) => {
+      this.setState({
+        scrollEnabled: scrollBool
+      });
+    }
+
+    setRefreshing = (refreshBool) => {
+      console.log('Setting refreshing: ', refreshBool);
+      this.setState({
+        refreshing: refreshBool
+      });
     }
 
     loadUserData = (data) => {
@@ -190,6 +205,28 @@ class WeatherScreen extends Component {
 
   }
 
+  _onScroll = (event) => {
+    console.log('_onScroll event: ', event);
+    if (event && event.nativeEvent.contentOffset.y) {
+      console.log('_onScroll nativeEvent: ', event.nativeEvent);
+      if (event.nativeEvent.contentOffset.y > 0) {
+        this.refs.scrollView.scrollTo({x:0,y:0,animated:false});
+        setScrollEnabled(false);
+      } else {
+        setScrollEnabled(true);
+      }
+    } else {
+      console.log('Event empty for _onScroll');
+      this.refs.scrollView.scrollTo(0);
+      setScrollEnabled(true);
+    }
+  }
+
+  _onRefresh = () => {
+    setRefreshing(true);
+    this._getWeather();
+  }
+
   _getWeather() {
     let endpointAPI = this.state.config.endpointAPI;
     let authToken = this.state.config.authToken;
@@ -206,6 +243,7 @@ class WeatherScreen extends Component {
         ],
         { cancelable: false }
       );
+      setRefreshing(false);
       return;
     }
 
@@ -217,6 +255,7 @@ class WeatherScreen extends Component {
       .then(function (response) {
         console.log('Success', response);
         updateWeatherData(response.data);
+        setRefreshing(false);
       })
       .catch(function (error) {
         console.log('Error: ', error, error.request);
@@ -228,6 +267,7 @@ class WeatherScreen extends Component {
           ],
           { cancelable: false }
         );
+        setRefreshing(false);
       });
   }
 
@@ -354,11 +394,21 @@ class WeatherScreen extends Component {
   _updateCurrentPosition(reset) {
     console.log('Starting _updateCurrentPosition');
 
+    let weatherExpired = false;
+    if (Date.now() > (this.state.weather.expires)) {
+      console.log('Setting weatherExpired to true');
+      weatherExpired = true;
+    }
+
     if (this.state.prediction.primaryPercent != '--' & reset != true) {
       console.log('Ignoring _updateCurrentPosition due to prediction already loaded');
       return;
     } else if (this.props.override) {
       console.log('Ignoring _updateCurrentPosition due to override, but calling _getWeather');
+      this._getWeather();
+      return;
+    } else if (weatherExpired & !this.state.disabledControls.showReset & !this.state.disabledControls.predictionButton) {
+      console.log('Updating weather due to expiration and no prediction');
       this._getWeather();
       return;
     }
@@ -429,21 +479,38 @@ class WeatherScreen extends Component {
     const activityKeys = Object.keys(activityOptions);
 
     const upperClothingOptions = {
-      'long_sleeves': 'Long Sleeves',
+      'tank': 'Tank Top',
       'short_sleeves': 'Short Sleeves',
-      'jacket': 'Jacket',
-      'tank': 'Tank Top'
+      'long_sleeves': 'Long Sleeves',
+      'light_jacket': 'Light Jacket',
+      'heavy_jacket': 'Heavy Jacket'
     };
     const upperClothingKeys = Object.keys(upperClothingOptions);
 
     const lowerClothingOptions = {
-      'shorts': 'Shorts',
-      'pants': 'Pants'
+      'shorts': 'Shorts/Skirt',
+      'pants': 'Pants/Dress'
     };
     const lowerClothingKeys = Object.keys(lowerClothingOptions);
 
     return (
       <SafeAreaView style={styles.weatherContainer}>
+        <ScrollView
+          // scrollEnabled={this.state.scrollEnabled}
+          // bounces={this.state.scrollEnabled}
+          // scrollEventThrottle={1}
+          // onScroll={this._onScroll}
+          // contentContainerStyle={{ paddingBottom: 100 }}
+          pinchGestureEnabled={false}
+          showsVerticalScrollIndicator={false}
+          ref="scrollView"
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this._onRefresh}
+            />
+          }
+        >
         <View style={styles.weatherRow}>
           <View style={styles.weatherCols}>
             <TouchableOpacity style={{paddingHorizontal: 10}} onPress={()=>this._getWeather()}>
@@ -536,6 +603,7 @@ class WeatherScreen extends Component {
             👎 Warm
           </RoundedButtonExp>
         </View>
+        </ScrollView>
       </SafeAreaView>
     )
   }
