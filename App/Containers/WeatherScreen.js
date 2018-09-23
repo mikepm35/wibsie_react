@@ -496,13 +496,13 @@ class WeatherScreen extends Component {
     return (
       <SafeAreaView style={styles.weatherContainer}>
         <ScrollView
-          scrollEnabled={this.state.scrollEnabled}
-          bounces={this.state.scrollEnabled}
-          scrollEventThrottle={1}
-          contentContainerStyle={{ paddingBottom: 100 }}
+          // scrollEnabled={this.state.scrollEnabled}
+          // bounces={this.state.scrollEnabled}
+          // scrollEventThrottle={1}
+          // onScroll={this._onScroll}
+          // contentContainerStyle={{ paddingBottom: 100 }}
           pinchGestureEnabled={false}
           showsVerticalScrollIndicator={false}
-          onScroll={this._onScroll}
           ref="scrollView"
           refreshControl={
             <RefreshControl
