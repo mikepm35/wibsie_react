@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ScrollView, Text, View, SafeAreaView, Picker, Button, TouchableHighlight, TouchableOpacity, Alert, RefreshControl } from 'react-native'
+import { AppState, ScrollView, Text, View, SafeAreaView, Picker, Button, TouchableHighlight, TouchableOpacity, Alert, RefreshControl } from 'react-native'
 import { StackNavigator } from 'react-navigation'
 import { connect } from 'react-redux'
 import axios from 'axios'
@@ -21,6 +21,7 @@ class WeatherScreen extends Component {
   constructor (props) {
     super(props);
     this.state = {
+      appState: AppState.currentState,
       config: WibsieConfig,
       refreshing: false,
       scrollEnabled: true,
@@ -465,13 +466,25 @@ class WeatherScreen extends Component {
   componentDidMount() {
     loadUserData(this.props.navigation.state.params.user);
 
+    AppState.addEventListener('change', this._handleAppStateChange);
+
     this.subs = [
       this.props.navigation.addListener('didFocus', () => this._updateCurrentPosition()),
     ];
   }
 
   componentWillUnmount() {
+      AppState.removeEventListener('change', this._handleAppStateChange);
+
       this.subs.forEach(sub => sub.remove());
+  }
+
+  _handleAppStateChange = (nextAppState) => {
+    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+      console.log('App has come to the foreground');
+      this._updateCurrentPosition();
+    }
+    this.setState({appState: nextAppState});
   }
 
   static navigationOptions = ({navigation, state}) => {
