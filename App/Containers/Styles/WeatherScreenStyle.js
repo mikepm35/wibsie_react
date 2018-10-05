@@ -45,7 +45,7 @@ export default StyleSheet.create({
   },
   weatherInfoRow: {
     backgroundColor: 'transparent',
-    paddingTop: Metrics.section
+    paddingBottom: Metrics.section
   },
   weatherInfoText: {
     ...Fonts.style.normal,
