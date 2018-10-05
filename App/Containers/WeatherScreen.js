@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { ScrollView, Text, View, SafeAreaView, Picker, Button, TouchableHighlight, TouchableOpacity, Alert, RefreshControl } from 'react-native'
+import { AppState, ScrollView, Text, View, SafeAreaView, Picker, Button, TouchableHighlight, TouchableOpacity, Alert, RefreshControl } from 'react-native'
 import { StackNavigator } from 'react-navigation'
 import { connect } from 'react-redux'
 import axios from 'axios'
@@ -21,6 +21,7 @@ class WeatherScreen extends Component {
   constructor (props) {
     super(props);
     this.state = {
+      appState: AppState.currentState,
       config: WibsieConfig,
       refreshing: false,
       scrollEnabled: true,
@@ -43,8 +44,8 @@ class WeatherScreen extends Component {
                 precipProbability: '--',
                 windSpeed: '--'},
       experience: {activity: 'standing',
-                        upper_clothing: 'long_sleeves',
-                        lower_clothing: 'pants'},
+                    upper_clothing: 'long_sleeves',
+                    lower_clothing: 'pants'},
       prediction: {primaryPercent: '--',
                     primaryResult: '--',
                     blendPercent: '--'}
@@ -172,13 +173,30 @@ class WeatherScreen extends Component {
 
     updatePredictionData = (data) => {
       let comfortPredict = data[0].comfortable;
+      let uncomfortcoldPredict = data[0].uncomfortable_cold;
+      let uncomfortwarmPredict = data[0].uncomfortable_warm;
       let uncomfortPredict = data[0].uncomfortable;
 
       if (comfortPredict >= 0.5) {
         var primaryPercent = (comfortPredict*100).toFixed(0);
         var primaryResult = 'Comfortable';
-      } else {
+      } else if (typeof uncomfortwarmPredict === 'undefined') {
+        console.log('Logging an uncomfortable due to no uncomfortwarmPredict')
+        var primaryPercent = ((1-comfortPredict)*100).toFixed(0);
+        var primaryResult = 'Uncomfortable';
+      } else if (uncomfortcoldPredict >= 0.5) {
+        var primaryPercent = (uncomfortcoldPredict*100).toFixed(0);
+        var primaryResult = 'Too Cold';
+      } else if (uncomfortwarmPredict >= 0.5) {
+        var primaryPercent = (uncomfortwarmPredict*100).toFixed(0);
+        var primaryResult = 'Too Warm';
+      } else if (typeof uncomfortPredict != 'undefined') {
+        console.log('Using legacy uncomfortPredict');
         var primaryPercent = (uncomfortPredict*100).toFixed(0);
+        var primaryResult = 'Uncomfortable';
+      } else {
+        console.log('Using generic uncomfortable due to no value over 0.5');
+        var primaryPercent = ((1-comfortPredict)*100).toFixed(0);
         var primaryResult = 'Uncomfortable';
       }
 
@@ -448,13 +466,25 @@ class WeatherScreen extends Component {
   componentDidMount() {
     loadUserData(this.props.navigation.state.params.user);
 
+    AppState.addEventListener('change', this._handleAppStateChange);
+
     this.subs = [
       this.props.navigation.addListener('didFocus', () => this._updateCurrentPosition()),
     ];
   }
 
   componentWillUnmount() {
+      AppState.removeEventListener('change', this._handleAppStateChange);
+
       this.subs.forEach(sub => sub.remove());
+  }
+
+  _handleAppStateChange = (nextAppState) => {
+    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+      console.log('App has come to the foreground');
+      this._updateCurrentPosition();
+    }
+    this.setState({appState: nextAppState});
   }
 
   static navigationOptions = ({navigation, state}) => {
@@ -561,7 +591,7 @@ class WeatherScreen extends Component {
           </Picker>
         </View>
         <View style={styles.predictionRow}>
-          <Text style={styles.predictionText}>{this.state.prediction.primaryPercent}% {this.state.prediction.primaryResult}</Text>
+          <Text style={styles.predictionText}>{this.state.prediction.primaryResult} [{this.state.prediction.primaryPercent}%]</Text>
         </View>
         <View style={styles.predictionButtonRow}>
           {this.state.disabledControls.showReset ? (
