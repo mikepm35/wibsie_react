@@ -54,7 +54,7 @@ class SettingsScreen extends Component {
         console.log('Retrieved local user data: ', userid, email);
         this.setState({
           user: {email: email,
-                  password: userid}
+                  id: userid}
         });
       } catch (error) {
         console.log('Error updating user from local: ', error);
@@ -116,7 +116,14 @@ class SettingsScreen extends Component {
      });
    }
 
-   _loadUserFromId(userid) {
+   _loadUser() {
+     let userid = this.state.user.id;
+
+     if (!userid) {
+       console.log('userid is null!, not sending request: ', userid);
+       return;
+     }
+
      let url = this.state.config.endpointAPI + '/users/' + userid + '?schema=' + this.state.config.schema;
      console.log('User id get url: ', url);
 
@@ -131,12 +138,12 @@ class SettingsScreen extends Component {
    }
 
    componentDidMount() {
-     //updateUserFromLocal();
+     updateUserFromLocal();
      if (this.props.override == true) {
        this._updateZipSave(this.props.zip);
      }
      this.subs = [
-       this.props.navigation.addListener('didFocus', () => this._loadUserFromId(this.props.id)),
+       this.props.navigation.addListener('didFocus', () => this._loadUser()),
      ];
   }
 
