@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { AsyncStorage, SafeAreaView, Text, View, TextInput, Alert } from 'react-native'
+import { AsyncStorage, SafeAreaView, Text, View, TextInput, Alert, Linking, TouchableOpacity } from 'react-native'
 import { StackNavigator } from 'react-navigation'
 import { connect } from 'react-redux'
 import RoundedButton from '../../App/Components/RoundedButton';
@@ -196,6 +196,11 @@ class SettingsScreen extends Component {
             onPress={() => this._logout()}>
             Logout
           </RoundedButton>
+        </View>
+        <View>
+          <TouchableOpacity onPress={ () => { Linking.openURL('http://wibsie.com/privacy')} }>
+            <Text style={styles.inputLabel}>Privacy Policy</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     )
