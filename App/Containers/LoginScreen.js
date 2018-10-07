@@ -97,6 +97,7 @@ class LoginScreen extends Component {
         ],
         { cancelable: false }
       )
+      updateLoginActivity(false);
       return;
     }
 
@@ -110,6 +111,7 @@ class LoginScreen extends Component {
         ],
         { cancelable: false }
       )
+      updateLoginActivity(false);
       return;
     }
 
