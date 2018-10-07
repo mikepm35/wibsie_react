@@ -35,7 +35,7 @@ export default StyleSheet.create({
   },
   row: {
     flex: 1,
-    paddingVertical: Metrics.section,
+    paddingVertical: (Metrics.height < 700) ? Metrics.section/5 : Metrics.section,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -62,6 +62,6 @@ export default StyleSheet.create({
   },
   logoutButtonRow: {
     paddingVertical: Metrics.section,
-    marginBottom: Metrics.section * 5
+    marginBottom: (Metrics.height < 700) ? Metrics.section : Metrics.section*5,
   },
 })

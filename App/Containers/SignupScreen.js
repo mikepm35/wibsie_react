@@ -134,6 +134,42 @@ class SignupScreen extends Component {
       return;
     }
 
+    // Validate that user is at least 13
+    let oldEnough = true;
+    let dateNow = new Date();
+    let yearEarliest = dateNow.getFullYear() - 13;
+    let monthEarliest = dateNow.getMonth()+1;  // To match picker
+    let dayEarliest = dateNow.getDate();
+
+    console.log('Age comparisons (submit,criteria): ', this.state.user.birth_year, yearEarliest, parseInt(this.state.user.birth_month), monthEarliest, this.state.user.birth_day, dayEarliest);
+
+    if (this.state.user.birth_year > yearEarliest) {
+      oldEnough = false;
+    } else if (this.state.user.birth_year == yearEarliest) {
+      if (parseInt(this.state.user.birth_month) > monthEarliest) {
+        oldEnough = false;
+      } else if (this.state.user.birth_month == monthEarliest) {
+        if (this.state.user.birth_day > dayEarliest) {
+          oldEnough = false;
+        }
+      }
+    }
+
+    console.log('Age validation result: ', oldEnough);
+
+    if (oldEnough == false) {
+      Alert.alert(
+        'Error',
+        'You must be at least 13 to use this app',
+        [
+          {text: 'OK', onPress: () => {this.setState({validInput: false});}},
+        ],
+        { cancelable: false }
+      )
+      updateCreateActivity(false);
+      return;
+    }
+
     console.log('Starting create user post: ', this.state.user);
     axios.post(urlUser, {
         email: this.state.user.email,
