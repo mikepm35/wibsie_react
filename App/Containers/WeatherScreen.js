@@ -260,7 +260,7 @@ class WeatherScreen extends Component {
     let zip = this.props.zip;
 
     if (zip == '' | zip == null | zip == '--') {
-      console.error('No zip loaded');
+      console.log('No zip loaded');
       this._updateCurrentPosition();
       Alert.alert(
         'Error',
