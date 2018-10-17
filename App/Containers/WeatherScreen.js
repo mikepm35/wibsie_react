@@ -176,28 +176,36 @@ class WeatherScreen extends Component {
       let uncomfortcoldPredict = data[0].uncomfortable_cold;
       let uncomfortwarmPredict = data[0].uncomfortable_warm;
       let uncomfortPredict = data[0].uncomfortable;
+      let attributes = data[0].attributes;
 
-      if (comfortPredict >= 0.5) {
-        var primaryPercent = (comfortPredict*100).toFixed(0);
-        var primaryResult = 'Comfortable';
-      } else if (typeof uncomfortwarmPredict === 'undefined') {
-        console.log('Logging an uncomfortable due to no uncomfortwarmPredict')
-        var primaryPercent = ((1-comfortPredict)*100).toFixed(0);
-        var primaryResult = 'Uncomfortable';
-      } else if (uncomfortcoldPredict >= 0.5) {
-        var primaryPercent = (uncomfortcoldPredict*100).toFixed(0);
-        var primaryResult = 'Too Cold';
-      } else if (uncomfortwarmPredict >= 0.5) {
-        var primaryPercent = (uncomfortwarmPredict*100).toFixed(0);
-        var primaryResult = 'Too Warm';
-      } else if (typeof uncomfortPredict != 'undefined') {
-        console.log('Using legacy uncomfortPredict');
-        var primaryPercent = (uncomfortPredict*100).toFixed(0);
-        var primaryResult = 'Uncomfortable';
+      if (attributes != undefined) {
+        console.log('Using attributes for updatePredictionData');
+        var primaryPercent = (attributes.primary_percent*100).toFixed(0);
+        var primaryResult = attributes.primary_result[0].toUpperCase() + attributes.primary_result.slice(1);
       } else {
-        console.log('Using generic uncomfortable due to no value over 0.5');
-        var primaryPercent = ((1-comfortPredict)*100).toFixed(0);
-        var primaryResult = 'Uncomfortable';
+        console.log('Using legacy comfort prediction');
+        if (comfortPredict >= 0.5) {
+          var primaryPercent = (comfortPredict*100).toFixed(0);
+          var primaryResult = 'Comfortable';
+        } else if (typeof uncomfortwarmPredict === 'undefined') {
+          console.log('Logging an uncomfortable due to no uncomfortwarmPredict')
+          var primaryPercent = ((1-comfortPredict)*100).toFixed(0);
+          var primaryResult = 'Uncomfortable';
+        } else if (uncomfortcoldPredict >= 0.5) {
+          var primaryPercent = (uncomfortcoldPredict*100).toFixed(0);
+          var primaryResult = 'Too Cold';
+        } else if (uncomfortwarmPredict >= 0.5) {
+          var primaryPercent = (uncomfortwarmPredict*100).toFixed(0);
+          var primaryResult = 'Too Warm';
+        } else if (typeof uncomfortPredict != 'undefined') {
+          console.log('Using legacy uncomfortPredict');
+          var primaryPercent = (uncomfortPredict*100).toFixed(0);
+          var primaryResult = 'Uncomfortable';
+        } else {
+          console.log('Using generic uncomfortable due to no value over 0.5');
+          var primaryPercent = ((1-comfortPredict)*100).toFixed(0);
+          var primaryResult = 'Uncomfortable';
+        }
       }
 
       var blendPercent = '0.0';
@@ -210,7 +218,8 @@ class WeatherScreen extends Component {
                       uncomfortPredict: uncomfortPredict,
                       primaryPercent: primaryPercent,
                       primaryResult: primaryResult,
-                      blendPercent: blendPercent},
+                      blendPercent: blendPercent,
+                      attributes: attributes},
         disabledControls: {...this.state.disabledControls,
                             experiencePicker: true,
                             predictionButton: true,
@@ -251,7 +260,7 @@ class WeatherScreen extends Component {
     let zip = this.props.zip;
 
     if (zip == '' | zip == null | zip == '--') {
-      console.error('No zip loaded');
+      console.log('No zip loaded');
       this._updateCurrentPosition();
       Alert.alert(
         'Error',
@@ -290,7 +299,7 @@ class WeatherScreen extends Component {
   }
 
   _updatePredictionResponse(result) {
-    console.log('Starting _runPredictionWorkflow');
+    console.log('Starting _updatePredictionResponse');
 
     let endpointAPI = this.state.config.endpointAPI;
     let authToken = this.state.config.authToken;
@@ -369,25 +378,25 @@ class WeatherScreen extends Component {
             console.log('Success make prediction', response);
             updatePredictionData(response.data);
 
-            // Start update experience with prediction result
-            let comfortPredict = response.data[0].comfortable;
-            let urlExperienceUpdate = urlExperiences + '/' + experienceCreated.toString();
-            console.log('Starting experience update: ', urlExperienceUpdate);
-            axios.put(urlExperienceUpdate + '?schema=' + schema, {
-              zip: zip,
-              weather_expiration: weatherExpires,
-              activity: activity,
-              upper_clothing: upper_clothing,
-              lower_clothing: lower_clothing,
-              comfort_level_result: 'none',
-              comfort_level_prediction: comfortPredict,
-            }, {headers: {'AuthToken': authToken}})
-            .then(function (response) {
-              console.log('Success update experience', response);
-            })
-            .catch(function (error) {
-              console.log('Error update experience', error);
-            });
+            // // Start update experience with prediction result - NOT NEEDED
+            // let comfortPredict = response.data[0].comfortable;
+            // let urlExperienceUpdate = urlExperiences + '/' + experienceCreated.toString();
+            // console.log('Starting experience update: ', urlExperienceUpdate);
+            // axios.put(urlExperienceUpdate + '?schema=' + schema, {
+            //   zip: zip,
+            //   weather_expiration: weatherExpires,
+            //   activity: activity,
+            //   upper_clothing: upper_clothing,
+            //   lower_clothing: lower_clothing,
+            //   comfort_level_result: 'none',
+            //   comfort_level_prediction: comfortPredict,
+            // }, {headers: {'AuthToken': authToken}})
+            // .then(function (response) {
+            //   console.log('Success update experience', response);
+            // })
+            // .catch(function (error) {
+            //   console.log('Error update experience', error);
+            // });
 
           })
           .catch(function (error) {

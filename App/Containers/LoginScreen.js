@@ -21,7 +21,8 @@ class LoginScreen extends Component {
       this.state = {
         config: WibsieConfig,
         user: {email: '',
-                password: ''},
+                password: '',
+                blend: null},
         disabledControls: {loginDisabled: false,
                             loginActivity: false}
       }
@@ -50,9 +51,15 @@ class LoginScreen extends Component {
       };
 
       updateUserData = (data) => {
+        var blend = null;
+        if (data.hasOwnProperty('model')) {
+          blend = data.model.model_blend_pct
+        }
+
         this.setState({
           user: {...this.state.user,
                   id: data.id,
+                  blend: blend,
                   birth_year: data.birth_year,
                   gender: data.gender,
                   height_in: data.height_in,
@@ -63,17 +70,14 @@ class LoginScreen extends Component {
         storeUserLocal();
 
         // Add to redux
-        var blend = null;
-        if (data.hasOwnProperty('model')) {
-          blend = data.model.model_blend_pct
-        }
         this.props.setUser(data.id, blend, data.email);
       };
 
       storeUserLocal = async () => {
         try {
-          console.log('Storing user state locally: ', this.state.user);
+          console.log('Storing user state locally: ', this.state.user, this.state.user.blend.toString());
           await AsyncStorage.setItem('wibsie:userid', this.state.user.id);
+          await AsyncStorage.setItem('wibsie:blend', this.state.user.blend.toString());
           await AsyncStorage.setItem('wibsie:useremail', this.state.user.email);
         } catch (error) {
           console.log('Error storing user from login: ', error);
@@ -155,19 +159,27 @@ class LoginScreen extends Component {
         updateUserData(response.data);
       })
       .catch(function (error) {
-        console.error('Error fetching user from id: ', error, error.request);
+        console.log('Error fetching user from id: ', error, error.request);
       });
   }
 
   _getUserFromLocal = async () => {
     try {
       const userid = await AsyncStorage.getItem('wibsie:userid');
+      const email = await AsyncStorage.getItem('wibsie:useremail');
+      const blendStr = await AsyncStorage.getItem('wibsie:blend');
+      const blend = Number(blendStr);
       if (userid !== null) {
-        console.log('Retrieved user data from local: ', userid);
+        console.log('Retrieved user data from local: ', userid, blendStr, blend, email);
+        // Load to redux
+        this.props.setUser(userid, blend, email);
+
         // Hit api to pull user info
         this._loadUserFromId(userid);
+
         // Navigate away
         this.props.navigation.navigate('WeatherScreen', {user: {id: userid}});
+
       } else {
         console.log('No userid retrieved from local');
       }

@@ -48,23 +48,30 @@ class SettingsScreen extends Component {
     };
 
     updateUserFromLocal = async () => {
+      console.log('Starting updateUserFromLocal');
+
       try {
         var userid = await AsyncStorage.getItem('wibsie:userid');
+        var blendStr = await AsyncStorage.getItem('wibsie:blend');
+        var blend = Number(blendStr);
         var email = await AsyncStorage.getItem('wibsie:useremail');
-        console.log('Retrieved local user data: ', userid, email);
+        console.log('Retrieved local user data: ', userid, blendStr, blend, email);
         this.setState({
           user: {email: email,
+                  blend: blend,
                   id: userid}
         });
       } catch (error) {
         console.log('Error updating user from local: ', error);
       }
     }
+
   }
 
   _logout = async () => {
     try {
       await AsyncStorage.removeItem('wibsie:userid');
+      await AsyncStorage.removeItem('wibsie:blend');
       await AsyncStorage.removeItem('wibsie:useremail');
       this.props.navigation.navigate('LoginScreen');
       this.props.setZip(null);
@@ -133,11 +140,12 @@ class SettingsScreen extends Component {
          updateUserData(response.data);
        })
        .catch(function (error) {
-         console.error('Error fetching user from id: ', error, error.request);
+         console.log('Error fetching user from id: ', error, error.request);
        });
    }
 
    componentDidMount() {
+     console.log('Props on load: ', this.props);
      updateUserFromLocal();
      if (this.props.override == true) {
        this._updateZipSave(this.props.zip);
