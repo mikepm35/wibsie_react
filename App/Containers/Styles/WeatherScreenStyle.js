@@ -59,10 +59,75 @@ export default StyleSheet.create({
     flex: 2,
     backgroundColor: 'transparent'
   },
+  humanSidebar: {
+    margin: Metrics.smallMargin,
+    padding: Metrics.smallMargin,
+    width: Metrics.screenWidth - Metrics.smallMargin*4 - 110,
+    alignItems: 'center',
+    flexDirection: 'column',
+    flex: 2,
+    justifyContent: 'center',
+  },
+  humanView: {
+    height: 220,
+    width: 110,
+    alignItems: 'center',
+    margin: Metrics.smallMargin,
+    padding: Metrics.smallMargin,
+  },
+  imgMain: {
+    position: 'absolute',
+    top: 15,
+    left: 15
+  },
+  imgTshirt: {
+    position: 'absolute',
+    top: 15+79,
+    left: 15+4.3,
+    opacity: 0
+  },
+  imgLongsleeve: {
+    position: 'absolute',
+    top: 15+79,
+    left: 15+2.1,
+    opacity: 0
+  },
+  imgLightjacket: {
+    position: 'absolute',
+    top: 15+79,
+    left: 15+2.0,
+    opacity: 0
+  },
+  imgHeavyJacket: {
+    position: 'absolute',
+    top: 15+78.5,
+    left: 15-1,
+    opacity: 0
+  },
+  imgPants: {
+    position: 'absolute',
+    top: 15+131,
+    left: 15+12.8,
+    opacity: 0
+  },
+  imgToptouchable: {
+    position: 'absolute',
+    top: 15+75,
+    left: 15+0,
+    height: 60,
+    width: 75
+  },
+  imgBottomtouchable: {
+    position: 'absolute',
+    top: 15+60+75,
+    left: 15+0,
+    height: 65,
+    width: 75
+  },
   pickerStyle: {
     margin: Metrics.smallMargin,
     padding: Metrics.smallMargin,
-    width: Metrics.screenWidth / 3 - Metrics.smallMargin*2,
+    width: Metrics.screenWidth / 3 - Metrics.smallMargin*2
   },
   pickerText: {
     ...Fonts.style.description,
@@ -70,8 +135,8 @@ export default StyleSheet.create({
     height: (Metrics.aspectRatio > 1.6 & Metrics.height > 650) ? 100 : 75
   },
   predictionRow: {
-    paddingVertical: Metrics.section,
-    backgroundColor: 'transparent'
+    paddingVertical: Metrics.section/2,
+    backgroundColor: 'transparent',
   },
   predictionText: {
     ...Fonts.style.h3,
@@ -82,6 +147,14 @@ export default StyleSheet.create({
   },
   predictionButtonRow: {
     paddingBottom: Metrics.section
+  },
+  predictionButtonRow2: {
+    width: 200,
+  },
+  figureRow: {
+    flex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   resultRow: {
     flexDirection: 'row',

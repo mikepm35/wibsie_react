@@ -1,4 +1,5 @@
 import { StackNavigator } from 'react-navigation'
+import TestScreen from '../Containers/TestScreen'
 import SignupScreen from '../Containers/SignupScreen'
 import LoginScreen from '../Containers/LoginScreen'
 import SettingsScreen from '../Containers/SettingsScreen'
@@ -9,6 +10,7 @@ import styles, { tintColor } from './Styles/NavigationStyles'
 
 // Manifest of possible screens
 const PrimaryNav = StackNavigator({
+  TestScreen: { screen: TestScreen },
   SignupScreen: { screen: SignupScreen },
   LoginScreen: { screen: LoginScreen },
   SettingsScreen: { screen: SettingsScreen },
