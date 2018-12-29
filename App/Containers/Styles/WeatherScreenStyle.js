@@ -75,6 +75,20 @@ export default StyleSheet.create({
     margin: Metrics.smallMargin,
     padding: Metrics.smallMargin,
   },
+  activityView: {
+    width: 65,
+    height: 65
+  },
+  activityText: {
+    ...Fonts.style.label,
+    color: 'white',
+    textAlign: 'center',
+  },
+  activityImg: {
+    height: 50,
+    width: 50,
+    alignSelf: 'center'
+  },
   imgMain: {
     position: 'absolute',
     top: 15,

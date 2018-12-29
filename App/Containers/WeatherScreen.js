@@ -767,39 +767,39 @@ class WeatherScreen extends Component {
                 style={{}}
                 onPress={()=>this._updateActivity('standing')}
               >
-                <View style={{width:65,height:65}}>
+                <View style={styles.activityView}>
                   <Image
                     source={require('../Images/motionicons/003-standing-up-man.png')}
-                    style={{height: 50, width:60, alignSelf: 'center', tintColor: this.state.activityColor.standing}}
+                    style={[styles.activityImg, {tintColor: this.state.activityColor.standing}]}
                     resizeMode="contain"
                   />
-                  <Text style={{color:'white',textAlign:'center',fontSize:11}}>{this.state.activityColor.standing ? this.state.experience.activity : null}</Text>
+                  <Text style={styles.activityText}>{this.state.activityColor.standing ? this.state.experience.activity : null}</Text>
                 </View>
               </TouchableOpacity>
               <TouchableOpacity
                 style={{}}
                 onPress={()=>this._updateActivity('walking')}
               >
-                <View style={{width:65,height:65}}>
+                <View style={styles.activityView}>
                   <Image
                     source={require('../Images/motionicons/001-pedestrian-walking.png')}
-                    style={{height: 50, width:60, alignSelf: 'center', tintColor: this.state.activityColor.walking}}
+                    style={[styles.activityImg, {tintColor: this.state.activityColor.walking}]}
                     resizeMode="contain"
                   />
-                  <Text style={{color:'white',textAlign:'center',fontSize:11}}>{this.state.activityColor.walking ? this.state.experience.activity : null}</Text>
+                  <Text style={styles.activityText}>{this.state.activityColor.walking ? this.state.experience.activity : null}</Text>
                 </View>
               </TouchableOpacity>
               <TouchableOpacity
                 style={{}}
                 onPress={()=>this._updateActivity('exercising')}
               >
-                <View style={{width:65,height:65, paddingVertical: 5}}>
+                <View style={[styles.activityView, {paddingVertical: 5}]}>
                   <Image
                     source={require('../Images/motionicons/004-running.png')}
                     style={{height: 45, width:60, alignSelf: 'center', tintColor: this.state.activityColor.exercising}}
                     resizeMode="contain"
                   />
-                  <Text style={{color:'white',textAlign:'center',fontSize:11}}>{this.state.activityColor.exercising ? this.state.experience.activity : null}</Text>
+                  <Text style={styles.activityText}>{this.state.activityColor.exercising ? this.state.experience.activity : null}</Text>
                 </View>
               </TouchableOpacity>
             </View>
