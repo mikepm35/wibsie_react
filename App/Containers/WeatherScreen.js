@@ -53,7 +53,7 @@ class WeatherScreen extends Component {
       },
       experience: {
         activity: 'standing',
-        upper_clothing: 'long_sleeves',
+        upper_clothing: 'short_sleeves',
         lower_clothing: 'pants'
       },
       prediction: {
@@ -62,8 +62,8 @@ class WeatherScreen extends Component {
         blendPercent: '--'
       },
       uppercloOpacity: {
-        'short_sleeves': 0,
-        'long_sleeves': 1,
+        'short_sleeves': 1,
+        'long_sleeves': 0,
         'light_jacket': 0,
         'heavy_jacket': 0
       },
@@ -499,8 +499,6 @@ class WeatherScreen extends Component {
   }
 
   _updateUpperclo() {
-    console.log('_updateUpperclo running');
-
     switch(this.state.experience.upper_clothing) {
       case 'tank':
         console.log('_updateUpperclo tank');
@@ -566,7 +564,6 @@ class WeatherScreen extends Component {
   }
 
   _updateLowerclo() {
-    console.log('_updateLowerclo');
     switch(this.state.experience.lower_clothing) {
       case 'shorts':
         console.log('_updateLowerclo shorts');
@@ -753,11 +750,13 @@ class WeatherScreen extends Component {
             <TouchableOpacity
               style={styles.imgToptouchable}
               onPress={()=>this._updateUpperclo()}
+              disabled={this.state.disabledControls.experiencePicker}
             >
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.imgBottomtouchable}
               onPress={()=>this._updateLowerclo()}
+              disabled={this.state.disabledControls.experiencePicker}
             >
             </TouchableOpacity>
           </View>
@@ -766,6 +765,7 @@ class WeatherScreen extends Component {
               <TouchableOpacity
                 style={{}}
                 onPress={()=>this._updateActivity('standing')}
+                disabled={this.state.disabledControls.experiencePicker}
               >
                 <View style={styles.activityView}>
                   <Image
@@ -779,6 +779,7 @@ class WeatherScreen extends Component {
               <TouchableOpacity
                 style={{}}
                 onPress={()=>this._updateActivity('walking')}
+                disabled={this.state.disabledControls.experiencePicker}
               >
                 <View style={styles.activityView}>
                   <Image
@@ -792,6 +793,7 @@ class WeatherScreen extends Component {
               <TouchableOpacity
                 style={{}}
                 onPress={()=>this._updateActivity('exercising')}
+                disabled={this.state.disabledControls.experiencePicker}
               >
                 <View style={[styles.activityView, {paddingVertical: 5}]}>
                   <Image
