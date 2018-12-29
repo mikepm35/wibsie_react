@@ -290,13 +290,12 @@ class WeatherScreen extends Component {
       this._updateCurrentPosition();
       Alert.alert(
         'Error',
-        'No location loaded',
+        'No location loaded, check internet connection',
         [
-          {text: 'OK', onPress: () => {}},
+          {text: 'OK', onPress: () => setRefreshing(false)},
         ],
         { cancelable: false }
       );
-      setRefreshing(false);
       return;
     }
 
@@ -624,6 +623,8 @@ class WeatherScreen extends Component {
   }
 
   componentDidMount() {
+    console.log('Props on load: ', this.props);
+
     loadUserData(this.props.navigation.state.params.user);
 
     AppState.addEventListener('change', this._handleAppStateChange);

@@ -119,7 +119,10 @@ class LoginScreen extends Component {
       return;
     }
 
-    axios.post(urlUserQuery, {
+    const axiosClient = axios.create();
+    axiosClient.defaults.timeout = 10*1000;
+
+    axiosClient.post(urlUserQuery, {
         email: this.state.user.email,
         password: this.state.user.password
       }, {headers: {'AuthToken': this.state.config.authToken}})
@@ -130,12 +133,19 @@ class LoginScreen extends Component {
         updateLoginActivity(false);
       })
       .catch(function (error) {
-        console.log('Error user query: ', error);
+        console.log('Error user query: ', error.response);
 
         var alertError = 'Server error, please try again.';
-        if (error.response.status === 404) {
+        if (error.response == undefined) {
+          console.log('Error response undefined for user _checkCredentials');
+          alertError = 'Please check your connection and try again.';
+        }
+        else if (error.response.status === 404) {
           console.log('User not found');
           alertError = 'Incorrect username or password.';
+        } else {
+          console.log('Non 404 returned for user _checkCredentials');
+          alertError = 'Please check your connection and try again.';
         }
         Alert.alert(
           'Error',
