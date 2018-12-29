@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { AppState, ScrollView, Text, View, SafeAreaView, Picker, Button, TouchableHighlight, TouchableOpacity, Alert, RefreshControl } from 'react-native'
+import { AppState, ScrollView, Text, View, SafeAreaView, Picker, Button, TouchableHighlight, TouchableOpacity, Alert, RefreshControl, Image } from 'react-native'
 import { StackNavigator } from 'react-navigation'
 import { connect } from 'react-redux'
 import axios from 'axios'
@@ -7,8 +7,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import RoundedButton from '../../App/Components/RoundedButton'
 import RoundedButtonExp from '../../App/Components/RoundedButtonExp'
 import { DotIndicator } from 'react-native-indicators';
-import WibsieConfig from '../Config/WibsieConfig'
-import { Metrics } from '../Themes/'
+import WibsieConfig from '../Config/WibsieConfig';
+import { Metrics, Colors } from '../Themes/';
 
 // Add Actions - replace 'Your' with whatever your reducer is called :)
 // import YourActions from '../Redux/YourRedux'
@@ -25,30 +25,56 @@ class WeatherScreen extends Component {
       config: WibsieConfig,
       refreshing: false,
       scrollEnabled: true,
-      disabledControls: {experiencePicker: false,
-                          predictionButton: true,
-                          showReset: false,
-                          predictionResponse: true,
-                          showPredictionButtonActivity: false},
+      disabledControls: {
+        experiencePicker: false,
+        predictionButton: true,
+        showReset: false,
+        predictionResponse: true,
+        showPredictionButtonActivity: false
+      },
       user: {},
-      location: {zip: '--'},
-      geolocation: {latitude: null,
-                    longitude: null,
-                    error: null},
+      location: {
+        zip: '--'
+      },
+      geolocation: {
+        latitude: null,
+        longitude: null,
+        error: null
+      },
       weatherCreatedLocal: '--',
-      weather: {temperature: '--',
-                tempHigh: '--',
-                tempLow: '--',
-                summary: '--',
-                humidity: '--',
-                precipProbability: '--',
-                windSpeed: '--'},
-      experience: {activity: 'standing',
-                    upper_clothing: 'long_sleeves',
-                    lower_clothing: 'pants'},
-      prediction: {primaryPercent: '--',
-                    primaryResult: '--',
-                    blendPercent: '--'}
+      weather: {
+        temperature: '--',
+        tempHigh: '--',
+        tempLow: '--',
+        summary: '--',
+        humidity: '--',
+        precipProbability: '--',
+        windSpeed: '--'
+      },
+      experience: {
+        activity: 'standing',
+        upper_clothing: 'short_sleeves',
+        lower_clothing: 'pants'
+      },
+      prediction: {
+        primaryPercent: '--',
+        primaryResult: '--',
+        blendPercent: '--'
+      },
+      uppercloOpacity: {
+        'short_sleeves': 1,
+        'long_sleeves': 0,
+        'light_jacket': 0,
+        'heavy_jacket': 0
+      },
+      lowercloOpacity: {
+        'pants': 1
+      },
+      activityColor: {
+        'standing': Colors.steel,
+        'walking': null,
+        'exercising': null
+      }
     };
 
     setScrollEnabled = (scrollBool) => {
@@ -264,13 +290,12 @@ class WeatherScreen extends Component {
       this._updateCurrentPosition();
       Alert.alert(
         'Error',
-        'No location loaded',
+        'No location loaded, check internet connection',
         [
-          {text: 'OK', onPress: () => {}},
+          {text: 'OK', onPress: () => setRefreshing(false)},
         ],
         { cancelable: false }
       );
-      setRefreshing(false);
       return;
     }
 
@@ -419,7 +444,7 @@ class WeatherScreen extends Component {
   }
 
   _updateCurrentPosition(reset) {
-    console.log('Starting _updateCurrentPosition');
+    console.log('Starting _updateCurrentPosition', this.state.prediction.primaryPercent, reset);
 
     let weatherExpired = false;
     if (Date.now() > (this.state.weather.expires)) {
@@ -472,7 +497,134 @@ class WeatherScreen extends Component {
     );
   }
 
+  _updateUpperclo() {
+    switch(this.state.experience.upper_clothing) {
+      case 'tank':
+        console.log('_updateUpperclo tank');
+        this.setState({
+          experience: {...this.state.experience, upper_clothing: 'short_sleeves'},
+          uppercloOpacity: {
+            'short_sleeves': 1,
+            'long_sleeves': 0,
+            'light_jacket': 0,
+            'heavy_jacket': 0
+          }
+        })
+        break;
+      case 'short_sleeves':
+        console.log('_updateUpperclo short_sleeves');
+        this.setState({
+          experience: {...this.state.experience, upper_clothing: 'long_sleeves'},
+          uppercloOpacity: {
+            'short_sleeves': 0,
+            'long_sleeves': 1,
+            'light_jacket': 0,
+            'heavy_jacket': 0
+          }
+        })
+        break;
+      case 'long_sleeves':
+        console.log('_updateUpperclo long_sleeves');
+        this.setState({
+          experience: {...this.state.experience, upper_clothing: 'light_jacket'},
+          uppercloOpacity: {
+            'short_sleeves': 0,
+            'long_sleeves': 1,
+            'light_jacket': 1,
+            'heavy_jacket': 0
+          }
+        })
+        break;
+      case 'light_jacket':
+        console.log('_updateUpperclo light_jacket');
+        this.setState({
+          experience: {...this.state.experience, upper_clothing: 'heavy_jacket'},
+          uppercloOpacity: {
+            'short_sleeves': 0,
+            'long_sleeves': 1,
+            'light_jacket': 0,
+            'heavy_jacket': 1
+          }
+        })
+        break;
+      case 'heavy_jacket':
+        console.log('_updateUpperclo heavy_jacket');
+        this.setState({
+          experience: {...this.state.experience, upper_clothing: 'tank'},
+          uppercloOpacity: {
+            'short_sleeves': 0,
+            'long_sleeves': 0,
+            'light_jacket': 0,
+            'heavy_jacket': 0
+          }
+        })
+        break;
+    }
+  }
+
+  _updateLowerclo() {
+    switch(this.state.experience.lower_clothing) {
+      case 'shorts':
+        console.log('_updateLowerclo shorts');
+        this.setState({
+          experience: {...this.state.experience, lower_clothing: 'pants'},
+          lowercloOpacity: {
+            'pants': 1
+          }
+        })
+        break;
+      case 'pants':
+        console.log('_updateLowerclo pants');
+        this.setState({
+          experience: {...this.state.experience, lower_clothing: 'shorts'},
+          lowercloOpacity: {
+            'pants': 0
+          }
+        })
+        break;
+    }
+  }
+
+  _updateActivity(activityClicked) {
+    console.log('_updateActivity', activityClicked);
+
+    switch(activityClicked) {
+      case 'standing':
+        this.setState({
+          experience: {...this.state.experience, activity: 'standing'},
+          activityColor: {
+            'standing': Colors.steel,
+            'walking': null,
+            'exercising': null
+          }
+        })
+        break;
+      case 'walking':
+        this.setState({
+          experience: {...this.state.experience, activity: 'walking'},
+          activityColor: {
+            'standing': null,
+            'walking': Colors.steel,
+            'exercising': null
+          }
+        })
+        break;
+      case 'exercising':
+        this.setState({
+          experience: {...this.state.experience, activity: 'exercising'},
+          activityColor: {
+            'standing': null,
+            'walking': null,
+            'exercising': Colors.steel
+          }
+        })
+        break;
+    }
+  }
+
   componentDidMount() {
+    console.log('Props on load: ', this.props);
+
     loadUserData(this.props.navigation.state.params.user);
 
     AppState.addEventListener('change', this._handleAppStateChange);
@@ -571,54 +723,112 @@ class WeatherScreen extends Component {
           )}
         </View>
         <View style={styles.pickerRow}>
-          <Picker
-            selectedValue={this.state.experience.activity}
-            style={styles.pickerStyle}
-            itemStyle={styles.pickerText}
-            onValueChange={(itemValue, itemIndex) => this.setState({experience: {...this.state.experience, activity: itemValue}})}>
-            {(this.state.disabledControls.experiencePicker ? [this.state.experience.activity]:activityKeys).map((item,index) => {
-              return (<Picker.Item label={activityOptions[item]} value={item}/>)
-            })}
-          </Picker>
-          <Picker
-            selectedValue={this.state.experience.upper_clothing}
-            style={styles.pickerStyle}
-            itemStyle={styles.pickerText}
-            onValueChange={(itemValue, itemIndex) => this.setState({experience: {...this.state.experience, upper_clothing: itemValue}})}>
-            {(this.state.disabledControls.experiencePicker ? [this.state.experience.upper_clothing]:upperClothingKeys).map((item,index) => {
-              return (<Picker.Item label={upperClothingOptions[item]} value={item}/>)
-            })}
-          </Picker>
-          <Picker
-            selectedValue={this.state.experience.lower_clothing}
-            style={styles.pickerStyle}
-            itemStyle={styles.pickerText}
-            onValueChange={(itemValue, itemIndex) => this.setState({experience: {...this.state.experience, lower_clothing: itemValue}})}>
-            {(this.state.disabledControls.experiencePicker ? [this.state.experience.lower_clothing]:lowerClothingKeys).map((item,index) => {
-              return (<Picker.Item label={lowerClothingOptions[item]} value={item}/>)
-            })}
-          </Picker>
+          <View style={styles.humanView}>
+            <Image
+              source={require('../Images/human1/cartoon-human-png-4.png')}
+              style={styles.imgMain}
+            />
+            <Image
+              source={require('../Images/human1/tshirt.png')}
+              style={[styles.imgTshirt, {opacity: this.state.uppercloOpacity.short_sleeves}]}
+            />
+            <Image
+              source={require('../Images/human1/longsleeve.png')}
+              style={[styles.imgLongsleeve, {opacity: this.state.uppercloOpacity.long_sleeves}]}
+            />
+            <Image
+              source={require('../Images/human1/pants.png')}
+              style={[styles.imgPants, {opacity: this.state.lowercloOpacity.pants}]}
+            />
+            <Image
+              source={require('../Images/human1/lightjacket.png')}
+              style={[styles.imgLightjacket, {opacity: this.state.uppercloOpacity.light_jacket}]}
+            />
+            <Image
+              source={require('../Images/human1/heavyjacket.png')}
+              style={[styles.imgHeavyJacket, {opacity: this.state.uppercloOpacity.heavy_jacket}]}
+            />
+            <TouchableOpacity
+              style={styles.imgToptouchable}
+              onPress={()=>this._updateUpperclo()}
+              disabled={this.state.disabledControls.experiencePicker}
+            >
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.imgBottomtouchable}
+              onPress={()=>this._updateLowerclo()}
+              disabled={this.state.disabledControls.experiencePicker}
+            >
+            </TouchableOpacity>
+          </View>
+          <View style={styles.humanSidebar}>
+            <View style={styles.figureRow}>
+              <TouchableOpacity
+                style={{}}
+                onPress={()=>this._updateActivity('standing')}
+                disabled={this.state.disabledControls.experiencePicker}
+              >
+                <View style={styles.activityView}>
+                  <Image
+                    source={require('../Images/motionicons/003-standing-up-man.png')}
+                    style={[styles.activityImg, {tintColor: this.state.activityColor.standing}]}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.activityText}>{this.state.activityColor.standing ? this.state.experience.activity : null}</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{}}
+                onPress={()=>this._updateActivity('walking')}
+                disabled={this.state.disabledControls.experiencePicker}
+              >
+                <View style={styles.activityView}>
+                  <Image
+                    source={require('../Images/motionicons/001-pedestrian-walking.png')}
+                    style={[styles.activityImg, {tintColor: this.state.activityColor.walking}]}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.activityText}>{this.state.activityColor.walking ? this.state.experience.activity : null}</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{}}
+                onPress={()=>this._updateActivity('exercising')}
+                disabled={this.state.disabledControls.experiencePicker}
+              >
+                <View style={[styles.activityView, {paddingVertical: 5}]}>
+                  <Image
+                    source={require('../Images/motionicons/004-running.png')}
+                    style={{height: 45, width:60, alignSelf: 'center', tintColor: this.state.activityColor.exercising}}
+                    resizeMode="contain"
+                  />
+                  <Text style={styles.activityText}>{this.state.activityColor.exercising ? this.state.experience.activity : null}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.predictionButtonRow2}>
+              {this.state.disabledControls.showReset ? (
+                <RoundedButton
+                  disabled={false}
+                  showActivityIndicator={this.state.disabledControls.showPredictionButtonActivity}
+                  onPress={() => this._updateCurrentPosition(true)}>
+                  Reset
+                </RoundedButton>
+              ) : (
+                <RoundedButton
+                  disabled={this.state.disabledControls.predictionButton}
+                  showActivityIndicator={this.state.disabledControls.showPredictionButtonActivity}
+                  onPress={() => this._runPredictionWorkflow()}>
+                  Make Prediction
+                </RoundedButton>
+              )}
+            </View>
+          </View>
         </View>
         <View style={styles.predictionRow}>
           <Text style={styles.predictionText}>{this.state.prediction.primaryResult} [{this.state.prediction.primaryPercent}%]</Text>
         </View>
-        <View style={styles.predictionButtonRow}>
-          {this.state.disabledControls.showReset ? (
-            <RoundedButton
-              disabled={false}
-              showActivityIndicator={this.state.disabledControls.showPredictionButtonActivity}
-              onPress={() => this._updateCurrentPosition(true)}>
-              Reset
-            </RoundedButton>
-          ) : (
-            <RoundedButton
-              disabled={this.state.disabledControls.predictionButton}
-              showActivityIndicator={this.state.disabledControls.showPredictionButtonActivity}
-              onPress={() => this._runPredictionWorkflow()}>
-              Make Prediction
-            </RoundedButton>
-          )}
-        </View>
+
         <View>
           <Text style={styles.weatherInfoText}>{"What was your actual comfort level?"}</Text>
         </View>

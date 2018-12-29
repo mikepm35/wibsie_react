@@ -29,7 +29,7 @@ class SettingsScreen extends Component {
     super(props);
     this.state = {
       config: WibsieConfig,
-      user: {email: '<email>',
+      user: {email: '',
               id: ''},
       zipSave: {
         zip: '',
@@ -196,7 +196,7 @@ class SettingsScreen extends Component {
         </View>
         <View style={styles.row}>
           <Text style={styles.inputLabel}>Logged in as:</Text>
-          <Text style={styles.emailText}>{this.props.email}</Text>
+          <Text style={styles.emailText}>{this.props.email ? this.props.email : this.state.user.email}</Text>
         </View>
         <View style={styles.logoutButtonRow}>
           <RoundedButton
