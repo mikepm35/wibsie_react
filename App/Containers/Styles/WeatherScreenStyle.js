@@ -92,37 +92,49 @@ export default StyleSheet.create({
   imgMain: {
     position: 'absolute',
     top: 15,
-    left: 15
+    left: 15,
+    height: 189.88,
+    width: 70.48
   },
   imgTshirt: {
     position: 'absolute',
     top: 15+79,
     left: 15+4.3,
-    opacity: 0
+    opacity: 0,
+    height: 51.5,
+    width: 61.68
   },
   imgLongsleeve: {
     position: 'absolute',
     top: 15+79,
     left: 15+2.1,
-    opacity: 0
+    opacity: 0,
+    height: 61.41,
+    width: 65.98
   },
   imgLightjacket: {
     position: 'absolute',
     top: 15+79,
-    left: 15+2.0,
-    opacity: 0
+    left: 15+1.5,
+    opacity: 0,
+    height: 63,
+    width: 67
   },
   imgHeavyJacket: {
     position: 'absolute',
     top: 15+78.5,
     left: 15-1,
-    opacity: 0
+    opacity: 0,
+    height: 65,
+    width: 72
   },
   imgPants: {
     position: 'absolute',
     top: 15+131,
     left: 15+12.8,
-    opacity: 0
+    opacity: 0,
+    height: 57.13,
+    width: 44.73
   },
   imgToptouchable: {
     position: 'absolute',
